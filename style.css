@@ -31,8 +31,13 @@ body {
     color: #fff;
     text-transform: uppercase;
     font-weight: 700;
+    
+    transition: background .2s liner;
 }
 
+.btn:hover {
+    background: lightgreen;
+}
 /*
 var(--tg-theme-bg-color)
 var(--tg-theme-text-colot)
