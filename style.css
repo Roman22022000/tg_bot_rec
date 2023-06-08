@@ -11,7 +11,7 @@ body {
 }
 
 .inner {
-    display: grin;
+    display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 200px, 200px, 200px;
 }
@@ -36,4 +36,8 @@ body {
 /*
 var(--tg-theme-bg-color)
 var(--tg-theme-text-colot)
-var(--tg-theme-
+var(--tg-theme-hink-color)
+var(--tg-theme-linl-color)
+var(--tg-theme-button-color)
+var(--tg-theme-button-text-color)
+*/
