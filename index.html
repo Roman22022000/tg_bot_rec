@@ -113,6 +113,7 @@
     }
     .header p{margin:6px 0 0;opacity:.92;font-size:.9rem}
 
+    /* обновленная верхняя панель: без “входа/режима Telegram” */
     .tgbar{
       margin-top:10px;
       background: rgba(255,255,255,.14);
@@ -331,7 +332,6 @@
 
     .tiny{font-size:.85rem;color:var(--gray-700);line-height:1.4}
 
-    /* итог */
     .summaryCard{
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
@@ -359,7 +359,7 @@
       color:var(--gray-900);
     }
 
-    /* overlay “запрос принят” */
+    /* overlay: “Отправлено” (без требований быть в Telegram) */
     .accept-overlay{
       position:absolute;inset:0;display:none;align-items:center;justify-content:center;
       padding:18px;background: rgba(255,255,255,.86);backdrop-filter: blur(6px);z-index:50;
@@ -371,7 +371,7 @@
     }
     .accept-top{
       padding:18px 16px;color:#fff;
-      background: linear-gradient(120deg, #4f46e5, #06b6d4, #10b981, #818cf8);
+      background: linear-gradient(120deg, #10b981, #06b6d4, #4f46e5, #818cf8);
       background-size: 300% 300%;
       animation: gradMove 3.2s ease-in-out infinite;
     }
@@ -413,6 +413,17 @@
       font-weight:800;
       display:none;
     }
+
+    .disabledHint{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(251,113,133,.55);
+      background: rgba(251,113,133,.10);
+      color: var(--gray-900);
+      font-weight:900;
+      display:none;
+    }
   </style>
 </head>
 
@@ -422,16 +433,17 @@
       <div class="header-content">
         <div class="titleRow">
           <h1><i class="fas fa-boxes"></i> Заявка</h1>
-          <div class="tag" id="tgTag">Telegram: —</div>
+          <div class="tag" id="tgTag">WebApp: —</div>
         </div>
-        <p>Итог перед отправкой → Отправка в бота → “Запрос принят”</p>
+        <p>Итог перед отправкой → отправка в бот → на ПК-сервер → ответ от бота</p>
 
+        <!-- упрощено: без “входа”, только статус среды -->
         <div class="tgbar">
           <div class="tgleft">
             <div class="avatar" id="tgAvatar">TG</div>
             <div class="tgmeta">
-              <div class="tgname" id="tgName">Откройте через Telegram</div>
-              <div class="tgsub" id="tgSub">Открывайте форму из бота, чтобы отправка работала</div>
+              <div class="tgname" id="tgName">Пользователь</div>
+              <div class="tgsub" id="tgSub">Данные уйдут боту через tg.sendData()</div>
             </div>
           </div>
           <div class="tag warn" id="tgMode">не в Telegram</div>
@@ -452,12 +464,15 @@
       <div class="accept-overlay" id="acceptOverlay">
         <div class="accept-card">
           <div class="accept-top">
-            <h3><i class="fas fa-check"></i> Запрос принят</h3>
+            <h3><i class="fas fa-check"></i> Отправлено</h3>
             <div class="tiny" id="acceptSub">ID: —</div>
           </div>
           <div class="accept-body">
-            <p>Данные отправлены в бота через Telegram WebApp. SQL (пример):</p>
+            <p>Заявка отправлена в бот. SQL (для сохранения на сервере):</p>
             <div class="sql-box" id="sqlBox"></div>
+            <div class="tiny" style="margin-top:10px;">
+              Бот пересылает это на ваш ПК-сервер и отвечает в чат от имени бота.
+            </div>
           </div>
           <div class="accept-actions">
             <button class="mini-btn" id="copySqlBtn">Копировать SQL</button>
@@ -679,12 +694,10 @@
       <div class="form-step" id="step5">
         <h2 class="step-title"><i class="fas fa-clipboard-check"></i> Итог (перепроверьте)</h2>
 
-        <div class="summaryCard" id="summaryCard">
-          <!-- заполняется JS -->
-        </div>
+        <div class="summaryCard" id="summaryCard"></div>
 
-        <div class="warnBox" id="warnSend">
-          Отправка невозможна: откройте приложение через кнопку WebApp в вашем боте.
+        <div class="disabledHint" id="disabledHint">
+          В браузере вне Telegram отправка в бот невозможна. Откройте форму из Telegram (WebApp кнопка).
         </div>
 
         <div class="controls">
@@ -693,10 +706,9 @@
         </div>
 
         <div class="tiny" style="margin-top:10px;">
-          После отправки бот получит JSON (web_app_data) и сможет ответить “Запрос принят”.
+          При нажатии: показываем “Отправлено” и отправляем JSON боту через <b>tg.sendData()</b>.
         </div>
       </div>
-
     </div>
   </div>
 
@@ -704,7 +716,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-    // ===== Telegram =====
+    // ===== Telegram (только статус, без “входа”, без блокировки интерфейса) =====
     const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 
     const ui = {
@@ -722,8 +734,8 @@
 
       warn2: document.getElementById("warn2"),
       warn4: document.getElementById("warn4"),
-      warnSend: document.getElementById("warnSend"),
       summaryCard: document.getElementById("summaryCard"),
+      disabledHint: document.getElementById("disabledHint"),
     };
 
     function inTelegram(){ return !!tg; }
@@ -735,19 +747,20 @@
 
     function initTelegramUI() {
       if (!tg) {
-        ui.tgTag.textContent = "Telegram: OFF";
+        ui.tgTag.textContent = "WebApp: Browser";
         ui.tgMode.textContent = "не в Telegram";
         ui.tgMode.classList.remove("ok");
         ui.tgMode.classList.add("warn");
-        ui.tgName.textContent = "Откройте через Telegram";
-        ui.tgSub.textContent = "Для отправки в бота откройте форму из бота (WebApp кнопка)";
+        ui.tgName.textContent = "Откройте форму из Telegram";
+        ui.tgSub.textContent = "Вне Telegram tg.sendData() не работает";
         ui.tgAvatar.textContent = "TG";
         return;
       }
+
       tg.ready();
       tg.expand();
 
-      ui.tgTag.textContent = "Telegram: ON";
+      ui.tgTag.textContent = "WebApp: Telegram";
       ui.tgMode.textContent = "в Telegram";
       ui.tgMode.classList.remove("warn");
       ui.tgMode.classList.add("ok");
@@ -765,9 +778,9 @@
         const nameInput = document.getElementById("contactName");
         if (nameInput && !nameInput.value) nameInput.value = full || uname || "";
       } else {
-        ui.tgName.textContent = "Аккаунт не доступен";
-        ui.tgSub.textContent = "Откройте WebApp через кнопку в боте";
-        ui.tgAvatar.textContent = "!!";
+        ui.tgName.textContent = "Пользователь не доступен";
+        ui.tgSub.textContent = "Откройте WebApp через кнопку бота";
+        ui.tgAvatar.textContent = "TG";
       }
     }
 
@@ -916,7 +929,6 @@
     function safeStr(x){ return (x === null || x === undefined || x === "") ? "—" : String(x); }
 
     function renderSummary(){
-      // собрать значения из полей
       collectAll();
 
       const servicesHuman = state.services.length ? state.services.map(mapServiceName).join(", ") : "—";
@@ -941,9 +953,9 @@
         ${row("Комментарий", safeStr(state.contact.comment))}
       `;
 
-      // если не в телеграм — запрет отправки
+      // ВАЖНО: отправка в бот возможна только в Telegram WebApp
       const canSend = inTelegram() && !!getTgUser();
-      ui.warnSend.style.display = canSend ? "none" : "block";
+      ui.disabledHint.style.display = canSend ? "none" : "block";
       $("submit").disabled = !canSend;
     }
 
@@ -956,7 +968,6 @@
           </div>
         `;
       }
-      // chips view
       const list = (val && val !== "—") ? val.split(",").map(s=>s.trim()).filter(Boolean) : [];
       const chipsHtml = list.length
         ? `<div class="chips">${list.map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join("")}</div>`
@@ -1126,8 +1137,8 @@
       }catch{}
     });
 
-    function showAccepted(orderId, sql) {
-      ui.acceptSub.textContent = `ID: ${orderId}`;
+    function showSent(orderId, sql) {
+      ui.acceptSub.textContent = `ID: ${orderId} (в бот отправлено)`;
       ui.sqlBox.textContent = sql;
       ui.acceptOverlay.classList.add("show");
     }
@@ -1195,19 +1206,19 @@
         $(id).addEventListener("change", ()=>validateStep4(false));
       });
 
-      // submit
+      // SUBMIT:
+      // 1) показываем “Отправлено”
+      // 2) отправляем в бота tg.sendData(JSON)
       $("submit").addEventListener("click", () => {
-        // сбор данных
         collectAll();
 
-        // проверки
         if (!state.selectedCategory) { showStep(1); return; }
         if (!validateStep2(true)) { showStep(2); return; }
         if (!validateStep4(true)) { showStep(4); return; }
 
-        const user = getTgUser();
-        if (!tg || !user) {
-          ui.warnSend.style.display = "block";
+        const canSend = inTelegram() && !!getTgUser();
+        if (!canSend) {
+          ui.disabledHint.style.display = "block";
           return;
         }
 
@@ -1215,16 +1226,21 @@
         const orderId = `ORD-${Math.floor(100000 + Math.random()*900000)}`;
         const sql = buildSqlInsert(orderId, payload);
 
-        // 1) итоговое “принято” в приложении
-        showAccepted(orderId, sql);
+        // UI: сразу “Отправлено”
+        showSent(orderId, sql);
 
-        // 2) отправка в бот, который открыл WebApp (НЕ по @username)
-        // Бот получит это как message.web_app_data.data
-        tg.sendData(JSON.stringify({
-          order_id: orderId,
-          payload: payload,
-          sql: sql
-        }));
+        // отправка в бот (бот дальше отправит на ПК сервер и ответит от имени бота)
+        try{
+          tg.ready();
+          tg.sendData(JSON.stringify({
+            order_id: orderId,
+            payload: payload,
+            sql: sql
+          }));
+        }catch(e){
+          // если sendData упал — покажем подсказку
+          ui.disabledHint.style.display = "block";
+        }
       });
     }
 
@@ -1234,9 +1250,9 @@
       initMap();
       setupEventListeners();
 
-      // важное: в step5 “Отправка” активна только в Telegram
+      // В step5 кнопка submit активна только если это Telegram WebApp
       const canSend = inTelegram() && !!getTgUser();
-      ui.warnSend.style.display = canSend ? "none" : "block";
+      ui.disabledHint.style.display = canSend ? "none" : "block";
       $("submit").disabled = !canSend;
     });
   </script>
