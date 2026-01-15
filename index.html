@@ -1,1137 +1,1077 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Форма заявки на товар | Telegram Bot</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --primary: #4f46e5;
-            --primary-light: #818cf8;
-            --primary-dark: #3730a3;
-            --secondary: #10b981;
-            --light-bg: #f8fafc;
-            --white: #ffffff;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-700: #334155;
-            --gray-900: #0f172a;
-            --border-radius: 12px;
-            --border-radius-sm: 8px;
-            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            color: var(--gray-900);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: hidden;
-            border: 1px solid var(--gray-200);
-        }
-
-        .header {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
-            padding: 24px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-10px, -10px) rotate(360deg); }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
-        .form-container {
-            padding: 24px;
-            position: relative;
-            min-height: 500px;
-        }
-
-        .form-step {
-            display: none;
-            animation: slideIn 0.5s ease forwards;
-        }
-
-        .form-step.active {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-        }
-
-        .step-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .step-title i {
-            color: var(--primary);
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .category-item {
-            background: var(--light-bg);
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius-sm);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .category-item:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary-light);
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.1);
-        }
-
-        .category-item.selected {
-            border-color: var(--primary);
-            background: rgba(79, 70, 229, 0.05);
-        }
-
-        .category-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .category-name {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--gray-900);
-        }
-
-        .category-desc {
-            font-size: 0.85rem;
-            color: var(--gray-700);
-            line-height: 1.4;
-        }
-
-        .checkbox-wrapper {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-        }
-
-        .custom-checkbox {
-            width: 22px;
-            height: 22px;
-            border: 2px solid var(--gray-300);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .custom-checkbox.checked {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .custom-checkbox.checked::after {
-            content: '✓';
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--gray-900);
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius-sm);
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--white);
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .service-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius-sm);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .service-item:hover {
-            border-color: var(--primary-light);
-            transform: translateX(4px);
-        }
-
-        .service-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .service-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--light-bg);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        .service-name {
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .map-container {
-            height: 300px;
-            border-radius: var(--border-radius-sm);
-            overflow: hidden;
-            margin-bottom: 24px;
-            border: 2px solid var(--gray-200);
-            position: relative;
-        }
-
-        #map {
-            height: 100%;
-            width: 100%;
-        }
-
-        .map-instructions {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px;
-            border-radius: var(--border-radius-sm);
-            font-size: 0.9rem;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .map-point {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .point-indicator {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 3px solid white;
-        }
-
-        .point-1 {
-            background: var(--primary);
-        }
-
-        .point-2 {
-            background: var(--secondary);
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gray-200);
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: var(--border-radius-sm);
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-width: 140px;
-        }
-
-        .btn-prev {
-            background: var(--gray-100);
-            color: var(--gray-700);
-            border: 2px solid var(--gray-200);
-        }
-
-        .btn-prev:hover {
-            background: var(--gray-200);
-            transform: translateX(-2px);
-        }
-
-        .btn-next, .btn-submit {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
-        }
-
-        .btn-next:hover, .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        .btn-icon {
-            font-size: 1.1rem;
-        }
-
-        .progress-bar {
-            display: flex;
-            justify-content: center;
-            padding: 20px 24px 0;
-            gap: 8px;
-        }
-
-        .progress-step {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--gray-200);
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .progress-step.active {
-            background: var(--primary);
-            color: var(--white);
-            transform: scale(1.1);
-        }
-
-        .progress-step.completed {
-            background: var(--secondary);
-            color: var(--white);
-        }
-
-        .progress-step::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            width: 16px;
-            height: 2px;
-            background: var(--gray-200);
-            transform: translateY(-50%);
-        }
-
-        .progress-step:last-child::after {
-            display: none;
-        }
-
-        .completion-screen {
-            text-align: center;
-            padding: 40px 24px;
-            animation: fadeIn 0.8s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .completion-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--secondary), #34d399);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            color: white;
-            font-size: 2.5rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .completion-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--gray-900);
-        }
-
-        .completion-text {
-            color: var(--gray-700);
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 480px) {
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .controls {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .map-container {
-                height: 250px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Форма заявки на товар | Telegram Bot</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+
+    :root{
+      --primary:#4f46e5;
+      --primary-light:#818cf8;
+      --primary-dark:#3730a3;
+      --secondary:#10b981;
+
+      --light-bg:#f8fafc;
+      --white:#ffffff;
+
+      --gray-100:#f1f5f9;
+      --gray-200:#e2e8f0;
+      --gray-300:#cbd5e1;
+      --gray-700:#334155;
+      --gray-900:#0f172a;
+
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --box-shadow:0 10px 25px rgba(0,0,0,0.05);
+      --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    body{
+      background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:16px;
+      color:var(--gray-900);
+      overflow:hidden;
+    }
+
+    .container{
+      width:100%;
+      max-width:520px;
+      background:var(--white);
+      border-radius:var(--border-radius);
+      box-shadow:var(--box-shadow);
+      overflow:hidden;
+      border:1px solid var(--gray-200);
+      position:relative;
+    }
+
+    .header{
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+      color:var(--white);
+      padding:24px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .header::before{
+      content:'';
+      position:absolute;
+      inset:-60%;
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+      background-size:20px 20px;
+      animation: float 20s linear infinite;
+    }
+    @keyframes float{
+      0%{transform:translate(0,0) rotate(0deg)}
+      100%{transform:translate(-10px,-10px) rotate(360deg)}
+    }
+    .header-content{position:relative;z-index:2}
+    .header h1{
+      font-size:1.5rem;
+      font-weight:700;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .header p{opacity:.9;font-size:.9rem}
+
+    .progress-bar{
+      display:flex;
+      justify-content:center;
+      padding:20px 24px 0;
+      gap:8px;
+      background:var(--white);
+    }
+    .progress-step{
+      width:32px;height:32px;
+      border-radius:50%;
+      background:var(--gray-200);
+      color:var(--gray-700);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:.9rem;
+      transition:var(--transition);
+      position:relative;
+      user-select:none;
+    }
+    .progress-step.active{background:var(--primary);color:var(--white);transform:scale(1.1)}
+    .progress-step.completed{background:var(--secondary);color:var(--white)}
+    .progress-step::after{
+      content:'';
+      position:absolute;
+      top:50%;
+      left:100%;
+      width:16px;height:2px;
+      background:var(--gray-200);
+      transform:translateY(-50%);
+    }
+    .progress-step:last-child::after{display:none}
+
+    .form-container{
+      padding:24px;
+      position:relative;
+      min-height: 560px;
+    }
+
+    .form-step{display:none;animation:slideIn .5s ease forwards}
+    .form-step.active{display:block}
+
+    @keyframes slideIn{
+      from{opacity:0;transform:translateX(30px)}
+      to{opacity:1;transform:translateX(0)}
+    }
+    @keyframes slideOut{
+      from{opacity:1;transform:translateX(0)}
+      to{opacity:0;transform:translateX(-30px)}
+    }
+
+    .step-title{
+      font-size:1.2rem;
+      font-weight:800;
+      color:var(--gray-900);
+      margin-bottom:16px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .step-title i{color:var(--primary)}
+
+    .category-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+      margin-bottom:18px;
+    }
+    @media (max-width:480px){
+      .category-grid{grid-template-columns:1fr}
+    }
+
+    .category-item{
+      background:var(--light-bg);
+      border:2px solid var(--gray-200);
+      border-radius:var(--border-radius-sm);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      cursor:pointer;
+      transition:var(--transition);
+      position:relative;
+      min-height: 150px;
+    }
+    .category-item:hover{
+      transform:translateY(-4px);
+      border-color:var(--primary-light);
+      box-shadow:0 8px 20px rgba(79,70,229,.1);
+    }
+    .category-item.selected{
+      border-color:var(--primary);
+      background:rgba(79,70,229,.06);
+    }
+    .category-icon{
+      width:56px;height:56px;
+      background:linear-gradient(135deg,var(--primary-light),var(--primary));
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:12px;
+      color:white;
+      font-size:1.5rem;
+    }
+    .category-name{font-weight:800;margin-bottom:6px;color:var(--gray-900)}
+    .category-desc{font-size:.85rem;color:var(--gray-700);line-height:1.35}
+
+    .checkbox-wrapper{position:absolute;top:12px;right:12px}
+    .custom-checkbox{
+      width:22px;height:22px;
+      border:2px solid var(--gray-300);
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:var(--transition);
+      background:#fff;
+      flex: 0 0 auto;
+    }
+    .custom-checkbox.checked{background:var(--primary);border-color:var(--primary)}
+    .custom-checkbox.checked::after{content:'✓';color:#fff;font-weight:900;font-size:14px}
+
+    .input-group{margin-bottom:14px}
+    .input-group label{
+      display:block;
+      font-weight:800;
+      margin-bottom:8px;
+      color:var(--gray-900);
+      font-size: .95rem;
+    }
+    .input-group input, .input-group select, .input-group textarea{
+      width:100%;
+      padding:14px 16px;
+      border:2px solid var(--gray-200);
+      border-radius:var(--border-radius-sm);
+      font-size:1rem;
+      transition:var(--transition);
+      background:var(--white);
+    }
+    .input-group textarea{min-height:86px;resize:vertical}
+    .input-group input:focus, .input-group select:focus, .input-group textarea:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(79,70,229,.1);
+    }
+
+    .row3{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:480px){
+      .row3{grid-template-columns:1fr}
+    }
+
+    .services-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .service-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border:2px solid var(--gray-200);
+      border-radius:var(--border-radius-sm);
+      transition:var(--transition);
+      cursor:pointer;
+      background:#fff;
+    }
+    .service-item:hover{border-color:var(--primary-light);transform:translateX(4px)}
+    .service-info{display:flex;align-items:center;gap:12px}
+    .service-icon{
+      width:40px;height:40px;
+      background:var(--light-bg);
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--primary);
+      font-size:1.05rem;
+    }
+    .service-name{font-weight:800;color:var(--gray-900)}
+
+    .map-container{
+      height:300px;
+      border-radius:var(--border-radius-sm);
+      overflow:hidden;
+      margin-bottom:16px;
+      border:2px solid var(--gray-200);
+      position:relative;
+      background:#fff;
+    }
+    #map{height:100%;width:100%}
+    .map-instructions{
+      position:absolute;
+      top:12px;left:12px;right:12px;
+      background:rgba(255,255,255,.95);
+      padding:10px 12px;
+      border-radius:var(--border-radius-sm);
+      font-size:.9rem;
+      z-index:1000;
+      box-shadow:0 4px 12px rgba(0,0,0,.1);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .map-point{display:flex;align-items:center;gap:8px;font-weight:700}
+    .point-indicator{
+      width:14px;height:14px;border-radius:50%;
+      border:3px solid #fff;
+    }
+    .point-1{background:var(--primary)}
+    .point-2{background:var(--secondary)}
+
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      margin-top:20px;
+      padding-top:18px;
+      border-top:1px solid var(--gray-200);
+      gap:12px;
+    }
+    .btn{
+      padding:14px 18px;
+      border-radius:var(--border-radius-sm);
+      font-weight:800;
+      font-size:1rem;
+      cursor:pointer;
+      transition:var(--transition);
+      border:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-width: 150px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn-prev{
+      background:var(--gray-100);
+      color:var(--gray-700);
+      border:2px solid var(--gray-200);
+    }
+    .btn-prev:hover{background:var(--gray-200);transform:translateX(-2px)}
+    .btn-next, .btn-submit{
+      background:linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
+      color:#fff;
+    }
+    .btn-next:hover, .btn-submit:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(79,70,229,.3);
+    }
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none !important;box-shadow:none !important}
+
+    /* Экран “принято” + анимация градиента */
+    .accept-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+    }
+    .accept-overlay.show{display:flex}
+    .accept-card{
+      width:100%;
+      max-width: 420px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--gray-200);
+      overflow:hidden;
+      box-shadow: var(--box-shadow);
+      background:#fff;
+    }
+    .accept-top{
+      padding:18px 16px;
+      color:#fff;
+      background: linear-gradient(120deg, #4f46e5, #06b6d4, #10b981, #818cf8);
+      background-size: 300% 300%;
+      animation: gradMove 3.2s ease-in-out infinite;
+      position:relative;
+    }
+    @keyframes gradMove{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .accept-top h3{
+      display:flex;align-items:center;gap:10px;
+      font-size:1.15rem;font-weight:900;
+      margin:0;
+    }
+    .accept-body{padding:16px}
+    .accept-body p{color:var(--gray-700);line-height:1.5;margin:0 0 12px}
+    .sql-box{
+      border:2px solid var(--gray-200);
+      border-radius: var(--border-radius-sm);
+      padding:12px;
+      background:#fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12px;
+      color:var(--gray-900);
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .accept-actions{
+      display:flex; gap:10px; padding: 0 16px 16px;
+    }
+    .mini-btn{
+      flex:1;
+      padding:12px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight:900;
+      border:2px solid var(--gray-200);
+      background:#fff;
+      cursor:pointer;
+      transition: var(--transition);
+    }
+    .mini-btn:hover{transform:translateY(-1px)}
+    .mini-btn.primary{
+      border:none;
+      color:#fff;
+      background: linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
+    }
+
+    .tiny{font-size:.85rem;color:var(--gray-700)}
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <h1><i class="fas fa-boxes"></i> Форма заявки на товар</h1>
-                <p>Заполните форму для оформления заказа</p>
-            </div>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-step active" data-step="1">1</div>
-            <div class="progress-step" data-step="2">2</div>
-            <div class="progress-step" data-step="3">3</div>
-            <div class="progress-step" data-step="4">4</div>
-        </div>
-
-        <div class="form-container">
-            <!-- Шаг 1: Выбор категории -->
-            <div class="form-step active" id="step1">
-                <h2 class="step-title"><i class="fas fa-list"></i> Выберите категорию товара</h2>
-                <div class="category-grid">
-                    <div class="category-item" data-category="1">
-                        <div class="category-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
-                        <div class="category-name">Электроника</div>
-                        <div class="category-desc">Смартфоны, ноутбуки, планшеты</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="category-item" data-category="2">
-                        <div class="category-icon">
-                            <i class="fas fa-tshirt"></i>
-                        </div>
-                        <div class="category-name">Одежда</div>
-                        <div class="category-desc">Мужская, женская, детская</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="category-item" data-category="3">
-                        <div class="category-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="category-name">Книги</div>
-                        <div class="category-desc">Художественная, учебная литература</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="category-item" data-category="4">
-                        <div class="category-icon">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <div class="category-name">Для дома</div>
-                        <div class="category-desc">Мебель, посуда, интерьер</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="category-item" data-category="5">
-                        <div class="category-icon">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <div class="category-name">Спорт</div>
-                        <div class="category-desc">Тренажеры, инвентарь, одежда</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                    <div class="category-item" data-category="6">
-                        <div class="category-icon">
-                            <i class="fas fa-car"></i>
-                        </div>
-                        <div class="category-name">Автотовары</div>
-                        <div class="category-desc">Запчасти, аксессуары</div>
-                        <div class="checkbox-wrapper">
-                            <div class="custom-checkbox"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="controls">
-                    <div></div>
-                    <button class="btn btn-next" id="next1">
-                        <span>Далее</span>
-                        <i class="fas fa-arrow-right btn-icon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Шаг 2: Параметры товара -->
-            <div class="form-step" id="step2">
-                <h2 class="step-title"><i class="fas fa-cube"></i> Параметры товара</h2>
-                <div class="input-group">
-                    <label for="quantity"><i class="fas fa-boxes"></i> Количество товара</label>
-                    <input type="number" id="quantity" min="1" max="1000" value="1">
-                </div>
-                <div class="input-group">
-                    <label for="size"><i class="fas fa-ruler-combined"></i> Укажите размер</label>
-                    <select id="size">
-                        <option value="">Выберите размер</option>
-                        <option value="small">Маленький (до 10 кг)</option>
-                        <option value="medium">Средний (10-25 кг)</option>
-                        <option value="large">Большой (25-50 кг)</option>
-                        <option value="xlarge">Очень большой (50+ кг)</option>
-                    </select>
-                </div>
-                <div class="controls">
-                    <button class="btn btn-prev" id="prev2">
-                        <i class="fas fa-arrow-left btn-icon"></i>
-                        <span>Назад</span>
-                    </button>
-                    <button class="btn btn-next" id="next2">
-                        <span>Далее</span>
-                        <i class="fas fa-arrow-right btn-icon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Шаг 3: Дополнительные услуги -->
-            <div class="form-step" id="step3">
-                <h2 class="step-title"><i class="fas fa-concierge-bell"></i> Дополнительные услуги</h2>
-                <div class="services-grid">
-                    <div class="service-item" data-service="packaging">
-                        <div class="service-info">
-                            <div class="service-icon">
-                                <i class="fas fa-box-open"></i>
-                            </div>
-                            <div class="service-name">Упаковка</div>
-                        </div>
-                        <div class="custom-checkbox"></div>
-                    </div>
-                    <div class="service-item" data-service="sticker">
-                        <div class="service-info">
-                            <div class="service-icon">
-                                <i class="fas fa-sticky-note"></i>
-                            </div>
-                            <div class="service-name">Наклейка</div>
-                        </div>
-                        <div class="custom-checkbox"></div>
-                    </div>
-                    <div class="service-item" data-service="defect">
-                        <div class="service-info">
-                            <div class="service-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="service-name">Проверка на брак</div>
-                        </div>
-                        <div class="custom-checkbox"></div>
-                    </div>
-                    <div class="service-item" data-service="marking">
-                        <div class="service-info">
-                            <div class="service-icon">
-                                <i class="fas fa-tag"></i>
-                            </div>
-                            <div class="service-name">Маркировка</div>
-                        </div>
-                        <div class="custom-checkbox"></div>
-                    </div>
-                    <div class="service-item" data-service="assembly">
-                        <div class="service-info">
-                            <div class="service-icon">
-                                <i class="fas fa-tools"></i>
-                            </div>
-                            <div class="service-name">Сборка</div>
-                        </div>
-                        <div class="custom-checkbox"></div>
-                    </div>
-                </div>
-                <div class="controls">
-                    <button class="btn btn-prev" id="prev3">
-                        <i class="fas fa-arrow-left btn-icon"></i>
-                        <span>Назад</span>
-                    </button>
-                    <button class="btn btn-next" id="next3">
-                        <span>Далее</span>
-                        <i class="fas fa-arrow-right btn-icon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Шаг 4: Карта и склад -->
-            <div class="form-step" id="step4">
-                <h2 class="step-title"><i class="fas fa-map-marked-alt"></i> Указание склада</h2>
-                <div class="input-group">
-                    <label for="warehouse"><i class="fas fa-warehouse"></i> Выберите склад</label>
-                    <select id="warehouse">
-                        <option value="">Выберите склад</option>
-                        <option value="main">Основной склад (Центральный)</option>
-                        <option value="north">Северный склад</option>
-                        <option value="south">Южный склад</option>
-                        <option value="east">Восточный склад</option>
-                    </select>
-                </div>
-                <div class="map-container">
-                    <div class="map-instructions">
-                        <div class="map-point">
-                            <div class="point-indicator point-1"></div>
-                            <span>Точка 1: Место нахождения товара</span>
-                        </div>
-                        <div class="map-point">
-                            <div class="point-indicator point-2"></div>
-                            <span>Точка 2: Место хранения товара</span>
-                        </div>
-                        <small>Нажмите на карту, чтобы отметить точки</small>
-                    </div>
-                    <div id="map"></div>
-                </div>
-                <div class="controls">
-                    <button class="btn btn-prev" id="prev4">
-                        <i class="fas fa-arrow-left btn-icon"></i>
-                        <span>Назад</span>
-                    </button>
-                    <button class="btn btn-submit" id="submit">
-                        <span>Отправить заявку</span>
-                        <i class="fas fa-paper-plane btn-icon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Экран завершения -->
-            <div class="form-step" id="completion">
-                <div class="completion-screen">
-                    <div class="completion-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <h2 class="completion-title">Заявка успешно отправлена!</h2>
-                    <p class="completion-text">Ваша заявка была передана в обработку. Мы свяжемся с вами в ближайшее время для подтверждения деталей.</p>
-                    <p class="completion-text">Номер вашей заявки: <strong>#ORD-<span id="orderId">0000</span></strong></p>
-                    <button class="btn btn-submit" id="newOrder">
-                        <span>Создать новую заявку</span>
-                        <i class="fas fa-plus btn-icon"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+  <div class="container" id="app">
+    <div class="header">
+      <div class="header-content">
+        <h1><i class="fas fa-boxes"></i> Форма заявки на товар</h1>
+        <p>Заполните форму для оформления запроса</p>
+      </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // Состояние приложения
-        const state = {
-            currentStep: 1,
-            selectedCategory: null,
-            quantity: 1,
-            size: '',
-            services: [],
-            warehouse: '',
-            points: {
-                point1: null,
-                point2: null
-            }
-        };
+    <div class="progress-bar">
+      <div class="progress-step active" data-step="1">1</div>
+      <div class="progress-step" data-step="2">2</div>
+      <div class="progress-step" data-step="3">3</div>
+      <div class="progress-step" data-step="4">4</div>
+    </div>
 
-        // Карта Leaflet
-        let map = null;
-        let point1Marker = null;
-        let point2Marker = null;
+    <div class="form-container">
+      <!-- overlay “принято” -->
+      <div class="accept-overlay" id="acceptOverlay">
+        <div class="accept-card">
+          <div class="accept-top">
+            <h3><i class="fas fa-check"></i> Запрос принят</h3>
+            <div class="tiny" id="acceptSub">ID: —</div>
+          </div>
+          <div class="accept-body">
+            <p>Данные сформированы. Ниже SQL для записи в базу (пример).</p>
+            <div class="sql-box" id="sqlBox"></div>
+          </div>
+          <div class="accept-actions">
+            <button class="mini-btn" id="copySqlBtn">Копировать SQL</button>
+            <button class="mini-btn primary" id="closeOverlayBtn">Закрыть</button>
+          </div>
+        </div>
+      </div>
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация карты
-            initMap();
+      <!-- STEP 1 -->
+      <div class="form-step active" id="step1">
+        <h2 class="step-title"><i class="fas fa-list"></i> Категория товара + “Другое”</h2>
 
-            // Назначение обработчиков событий
-            setupEventListeners();
+        <div class="category-grid">
+          <div class="category-item" data-category="1">
+            <div class="category-icon"><i class="fas fa-laptop"></i></div>
+            <div class="category-name">Категория 1</div>
+            <div class="category-desc">Электроника</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
 
-            // Обновление состояния кнопок
-            updateButtons();
+          <div class="category-item" data-category="2">
+            <div class="category-icon"><i class="fas fa-tshirt"></i></div>
+            <div class="category-name">Категория 2</div>
+            <div class="category-desc">Одежда</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
+
+          <div class="category-item" data-category="3">
+            <div class="category-icon"><i class="fas fa-book"></i></div>
+            <div class="category-name">Категория 3</div>
+            <div class="category-desc">Книги</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
+
+          <div class="category-item" data-category="4">
+            <div class="category-icon"><i class="fas fa-home"></i></div>
+            <div class="category-name">Категория 4</div>
+            <div class="category-desc">Для дома</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
+
+          <div class="category-item" data-category="5">
+            <div class="category-icon"><i class="fas fa-dumbbell"></i></div>
+            <div class="category-name">Категория 5</div>
+            <div class="category-desc">Спорт</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
+
+          <div class="category-item" data-category="6">
+            <div class="category-icon"><i class="fas fa-car"></i></div>
+            <div class="category-name">Категория 6</div>
+            <div class="category-desc">Автотовары</div>
+            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="categoryOther"><i class="fas fa-pen"></i> Другое (уточнение категории)</label>
+          <input id="categoryOther" type="text" placeholder="Например: косметика, аксессуары..." />
+        </div>
+
+        <div class="controls">
+          <div></div>
+          <button class="btn btn-next" id="next1">
+            <span>Далее</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="form-step" id="step2">
+        <h2 class="step-title"><i class="fas fa-cube"></i> Количество + Размеры (Д×Ш×В) + Доставка</h2>
+
+        <div class="input-group">
+          <label for="quantity"><i class="fas fa-boxes"></i> Количество товара</label>
+          <input type="number" id="quantity" min="1" max="100000" value="1">
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-ruler-combined"></i> Размеры (самостоятельно)</label>
+          <div class="row3">
+            <input type="number" id="len" min="0" step="0.01" placeholder="Длина">
+            <input type="number" id="wid" min="0" step="0.01" placeholder="Ширина">
+            <input type="number" id="hei" min="0" step="0.01" placeholder="Высота">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="unit"><i class="fas fa-ruler"></i> Единица измерения</label>
+          <input type="text" id="unit" placeholder="см / мм / м" value="см">
+        </div>
+
+        <div class="input-group">
+          <label for="delivery"><i class="fas fa-truck"></i> Выбор доставки</label>
+          <select id="delivery">
+            <option value="">Выберите вариант</option>
+            <option value="deliver_ourselves">Доставим сами</option>
+            <option value="pickup_supplier">Забрать с поставщика</option>
+            <option value="pickup_cargo">Забрать с карго</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="deliveryOther"><i class="fas fa-pen"></i> Другое (доставка / уточнение)</label>
+          <input id="deliveryOther" type="text" placeholder="Адрес, контакты, время, комментарии..." />
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-prev" id="prev2"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
+          <button class="btn btn-next" id="next2"><span>Далее</span><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="form-step" id="step3">
+        <h2 class="step-title"><i class="fas fa-concierge-bell"></i> Доп. услуги + “Другое”</h2>
+
+        <div class="services-grid">
+          <div class="service-item" data-service="packaging">
+            <div class="service-info">
+              <div class="service-icon"><i class="fas fa-box-open"></i></div>
+              <div class="service-name">Упаковать</div>
+            </div>
+            <div class="custom-checkbox"></div>
+          </div>
+
+          <div class="service-item" data-service="sticker">
+            <div class="service-info">
+              <div class="service-icon"><i class="fas fa-sticky-note"></i></div>
+              <div class="service-name">Наклейка</div>
+            </div>
+            <div class="custom-checkbox"></div>
+          </div>
+
+          <div class="service-item" data-service="defect">
+            <div class="service-info">
+              <div class="service-icon"><i class="fas fa-search"></i></div>
+              <div class="service-name">Брак (проверка)</div>
+            </div>
+            <div class="custom-checkbox"></div>
+          </div>
+
+          <div class="service-item" data-service="marking">
+            <div class="service-info">
+              <div class="service-icon"><i class="fas fa-tag"></i></div>
+              <div class="service-name">Маркировка</div>
+            </div>
+            <div class="custom-checkbox"></div>
+          </div>
+
+          <div class="service-item" data-service="assembly">
+            <div class="service-info">
+              <div class="service-icon"><i class="fas fa-tools"></i></div>
+              <div class="service-name">Сборка</div>
+            </div>
+            <div class="custom-checkbox"></div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="servicesOther"><i class="fas fa-pen"></i> Другое (доп. услуги / уточнение)</label>
+          <input id="servicesOther" type="text" placeholder="Например: доп. упаковка, паллетирование..." />
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-prev" id="prev3"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
+          <button class="btn btn-next" id="next3"><span>Далее</span><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="form-step" id="step4">
+        <h2 class="step-title"><i class="fas fa-map-marked-alt"></i> Отгрузка на склад + Карта (2 точки) + Контакты</h2>
+
+        <div class="input-group">
+          <label for="shipWarehouse"><i class="fas fa-warehouse"></i> Отгрузка на какой склад</label>
+          <select id="shipWarehouse">
+            <option value="">Выберите</option>
+            <option value="WB">ВБ</option>
+            <option value="OZON">ОЗОН</option>
+            <option value="YANDEX">ЯНДЕКС</option>
+            <option value="FBS">FBS</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="shipWarehouseOther"><i class="fas fa-pen"></i> Другое (склад / уточнение)</label>
+          <input id="shipWarehouseOther" type="text" placeholder="Например: адрес склада, номер ворот, примечание..." />
+        </div>
+
+        <div class="map-container">
+          <div class="map-instructions">
+            <div class="map-point"><div class="point-indicator point-1"></div><span>Точка 1: место товара</span></div>
+            <div class="map-point"><div class="point-indicator point-2"></div><span>Точка 2: место хранения</span></div>
+            <small>Кликните по карте 2 раза. Третий клик — сброс.</small>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <div class="input-group">
+          <label for="contactName"><i class="fas fa-user"></i> Имя</label>
+          <input id="contactName" type="text" placeholder="Ваше имя" />
+        </div>
+
+        <div class="input-group">
+          <label for="contactPhone"><i class="fas fa-phone"></i> Номер</label>
+          <input id="contactPhone" type="text" placeholder="+7 ..." />
+        </div>
+
+        <div class="input-group">
+          <label for="commentFinal"><i class="fas fa-comment"></i> Комментарий</label>
+          <textarea id="commentFinal" placeholder="Любые уточнения по заявке"></textarea>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-prev" id="prev4"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
+          <button class="btn btn-submit" id="submit"><span>Отправка запроса</span><i class="fas fa-paper-plane"></i></button>
+        </div>
+
+        <div class="tiny" style="margin-top:10px;color:var(--gray-700);">
+          После отправки: “Запрос принят” + SQL (пример) + отправка данных в Telegram WebApp.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <script>
+    // ========= Telegram WebApp (optional) =========
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) { tg.ready(); tg.expand(); }
+
+    // ========= State =========
+    const state = {
+      currentStep: 1,
+      selectedCategory: null,
+      categoryOther: "",
+
+      quantity: 1,
+      dims: { len: null, wid: null, hei: null, unit: "см" },
+
+      delivery: "",
+      deliveryOther: "",
+
+      services: [],
+      servicesOther: "",
+
+      shipWarehouse: "",
+      shipWarehouseOther: "",
+
+      points: { point1: null, point2: null },
+
+      contact: { name: "", phone: "", comment: "" },
+    };
+
+    // ========= Map (Leaflet) =========
+    let map = null;
+    let point1Marker = null;
+    let point2Marker = null;
+    let line = null;
+
+    function initMap() {
+      map = L.map("map", { zoomControl: true }).setView([55.7558, 37.6173], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+
+      map.on("click", (e) => {
+        const { lat, lng } = e.latlng;
+
+        if (!state.points.point1) {
+          state.points.point1 = { lat, lng };
+          if (point1Marker) map.removeLayer(point1Marker);
+          point1Marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: "custom-marker",
+              html: '<div style="background:#4f46e5;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>'
+            })
+          }).addTo(map).bindPopup("Точка 1: место товара").openPopup();
+          return;
+        }
+
+        if (!state.points.point2) {
+          state.points.point2 = { lat, lng };
+          if (point2Marker) map.removeLayer(point2Marker);
+          point2Marker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: "custom-marker",
+              html: '<div style="background:#10b981;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>'
+            })
+          }).addTo(map).bindPopup("Точка 2: место хранения").openPopup();
+
+          if (line) map.removeLayer(line);
+          line = L.polyline(
+            [[state.points.point1.lat, state.points.point1.lng], [state.points.point2.lat, state.points.point2.lng]],
+            { color:"#4f46e5", weight:3, opacity:.7, dashArray:"10,10" }
+          ).addTo(map);
+          return;
+        }
+
+        // third click -> reset
+        resetMapPoints();
+      });
+    }
+
+    function resetMapPoints() {
+      state.points.point1 = null;
+      state.points.point2 = null;
+      if (point1Marker) { map.removeLayer(point1Marker); point1Marker = null; }
+      if (point2Marker) { map.removeLayer(point2Marker); point2Marker = null; }
+      if (line) { map.removeLayer(line); line = null; }
+    }
+
+    // ========= UI Helpers =========
+    function byId(id){ return document.getElementById(id); }
+
+    function setProgress(step) {
+      document.querySelectorAll(".progress-step").forEach(el => {
+        const s = Number(el.dataset.step);
+        el.classList.remove("active");
+        if (s < step) el.classList.add("completed");
+        else el.classList.remove("completed");
+        if (s === step) el.classList.add("active");
+      });
+    }
+
+    function showStep(step) {
+      const cur = byId(`step${state.currentStep}`);
+      const nxt = byId(`step${step}`);
+      if (!cur || !nxt) return;
+
+      cur.style.animation = "slideOut 0.5s ease forwards";
+      setTimeout(() => {
+        cur.classList.remove("active");
+        cur.style.animation = "";
+        nxt.classList.add("active");
+        nxt.style.animation = "slideIn 0.5s ease forwards";
+
+        state.currentStep = step;
+        setProgress(step);
+
+        // Leaflet needs invalidate on show
+        if (step === 4) setTimeout(() => map && map.invalidateSize(), 100);
+
+        updateButtons();
+      }, 450);
+    }
+
+    function updateButtons() {
+      // step1: category required
+      if (state.currentStep === 1) {
+        byId("next1").disabled = !state.selectedCategory;
+      }
+      // step2: quantity + dims + delivery required
+      if (state.currentStep === 2) {
+        const okQty = Number(byId("quantity").value) >= 1;
+        const len = Number(byId("len").value);
+        const wid = Number(byId("wid").value);
+        const hei = Number(byId("hei").value);
+        const unit = (byId("unit").value || "").trim();
+        const del = (byId("delivery").value || "").trim();
+        byId("next2").disabled = !(okQty && len > 0 && wid > 0 && hei > 0 && unit && del);
+      }
+      // step3: nothing mandatory
+      if (state.currentStep === 3) {
+        byId("next3").disabled = false;
+      }
+      // step4: shipWarehouse + 2 points + name + phone required
+      if (state.currentStep === 4) {
+        const wh = (byId("shipWarehouse").value || "").trim();
+        const hasPoints = !!state.points.point1 && !!state.points.point2;
+        const name = (byId("contactName").value || "").trim();
+        const phone = (byId("contactPhone").value || "").trim();
+        byId("submit").disabled = !(wh && hasPoints && name && phone);
+      }
+    }
+
+    // ========= Data -> SQL =========
+    function sqlEscape(str) {
+      if (str === null || str === undefined) return "";
+      return String(str).replace(/\\/g, "\\\\").replace(/'/g, "''");
+    }
+
+    function toJson(value) {
+      return JSON.stringify(value ?? null);
+    }
+
+    function buildPayload() {
+      return {
+        category: state.selectedCategory,
+        category_other: state.categoryOther,
+
+        quantity: state.quantity,
+        dimensions: state.dims, // len/wid/hei/unit
+
+        delivery: state.delivery,
+        delivery_other: state.deliveryOther,
+
+        services: state.services,
+        services_other: state.servicesOther,
+
+        ship_warehouse: state.shipWarehouse,
+        ship_warehouse_other: state.shipWarehouseOther,
+
+        point1: state.points.point1,
+        point2: state.points.point2,
+
+        contact_name: state.contact.name,
+        contact_phone: state.contact.phone,
+        comment: state.contact.comment,
+
+        ts: new Date().toISOString()
+      };
+    }
+
+    function buildSqlInsert(orderId, payload) {
+      // пример таблицы: orders
+      // поля можно менять под вашу БД
+      const p = payload;
+
+      const cols = [
+        "order_id",
+        "category",
+        "category_other",
+        "quantity",
+        "len",
+        "wid",
+        "hei",
+        "unit",
+        "delivery",
+        "delivery_other",
+        "services_json",
+        "services_other",
+        "ship_warehouse",
+        "ship_warehouse_other",
+        "point1_json",
+        "point2_json",
+        "contact_name",
+        "contact_phone",
+        "comment",
+        "created_at"
+      ];
+
+      const values = [
+        `'${sqlEscape(orderId)}'`,
+        `'${sqlEscape(p.category)}'`,
+        `'${sqlEscape(p.category_other)}'`,
+        Number(p.quantity || 0),
+
+        Number(p.dimensions?.len || 0),
+        Number(p.dimensions?.wid || 0),
+        Number(p.dimensions?.hei || 0),
+        `'${sqlEscape(p.dimensions?.unit || "")}'`,
+
+        `'${sqlEscape(p.delivery)}'`,
+        `'${sqlEscape(p.delivery_other)}'`,
+
+        `'${sqlEscape(toJson(p.services))}'`,
+        `'${sqlEscape(p.services_other)}'`,
+
+        `'${sqlEscape(p.ship_warehouse)}'`,
+        `'${sqlEscape(p.ship_warehouse_other)}'`,
+
+        `'${sqlEscape(toJson(p.point1))}'`,
+        `'${sqlEscape(toJson(p.point2))}'`,
+
+        `'${sqlEscape(p.contact_name)}'`,
+        `'${sqlEscape(p.contact_phone)}'`,
+        `'${sqlEscape(p.comment)}'`,
+        `'${sqlEscape(p.ts)}'`
+      ];
+
+      return `INSERT INTO orders (${cols.join(", ")})
+VALUES (${values.join(", ")});`;
+    }
+
+    // ========= Overlay =========
+    const overlay = byId("acceptOverlay");
+    const sqlBox = byId("sqlBox");
+    const acceptSub = byId("acceptSub");
+
+    function showAccepted(orderId, sql) {
+      acceptSub.textContent = `ID: ${orderId}`;
+      sqlBox.textContent = sql;
+      overlay.classList.add("show");
+    }
+
+    byId("closeOverlayBtn").addEventListener("click", () => {
+      overlay.classList.remove("show");
+      // optional: tg.close();
+    });
+
+    byId("copySqlBtn").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(sqlBox.textContent);
+        byId("copySqlBtn").textContent = "Скопировано";
+        setTimeout(()=> byId("copySqlBtn").textContent = "Копировать SQL", 900);
+      }catch{
+        // ignore
+      }
+    });
+
+    // ========= Setup listeners =========
+    function setupEventListeners() {
+      // category pick (single)
+      document.querySelectorAll(".category-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const cat = item.dataset.category;
+
+          document.querySelectorAll(".category-item").forEach(x => {
+            x.classList.remove("selected");
+            x.querySelector(".custom-checkbox").classList.remove("checked");
+          });
+
+          item.classList.add("selected");
+          item.querySelector(".custom-checkbox").classList.add("checked");
+          state.selectedCategory = cat;
+          updateButtons();
         });
+      });
 
-        // Инициализация карты
-        function initMap() {
-            map = L.map('map').setView([55.7558, 37.6173], 12);
+      // step1 other
+      byId("categoryOther").addEventListener("input", (e) => {
+        state.categoryOther = e.target.value;
+      });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+      // step2 fields
+      byId("quantity").addEventListener("input", (e) => {
+        state.quantity = Math.max(1, parseInt(e.target.value || "1", 10));
+        e.target.value = state.quantity;
+        updateButtons();
+      });
 
-            // Обработчик кликов по карте
-            map.on('click', function(e) {
-                if (!state.points.point1) {
-                    // Установка первой точки
-                    state.points.point1 = {
-                        lat: e.latlng.lat,
-                        lng: e.latlng.lng
-                    };
+      ["len","wid","hei","unit","delivery","deliveryOther"].forEach(id => {
+        byId(id).addEventListener("input", () => updateButtons());
+        byId(id).addEventListener("change", () => updateButtons());
+      });
 
-                    if (point1Marker) map.removeLayer(point1Marker);
-                    point1Marker = L.marker([e.latlng.lat, e.latlng.lng], {
-                        icon: L.divIcon({
-                            className: 'custom-marker',
-                            html: '<div style="background: #4f46e5; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>'
-                        })
-                    }).addTo(map);
+      // step3 services toggle
+      document.querySelectorAll(".service-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const key = item.dataset.service;
+          const cb = item.querySelector(".custom-checkbox");
+          cb.classList.toggle("checked");
 
-                    point1Marker.bindPopup("Точка 1: Место товара").openPopup();
+          if (cb.classList.contains("checked")) {
+            if (!state.services.includes(key)) state.services.push(key);
+          } else {
+            state.services = state.services.filter(x => x !== key);
+          }
+        });
+      });
 
-                } else if (!state.points.point2) {
-                    // Установка второй точки
-                    state.points.point2 = {
-                        lat: e.latlng.lat,
-                        lng: e.latlng.lng
-                    };
+      byId("servicesOther").addEventListener("input", (e)=> state.servicesOther = e.target.value);
 
-                    if (point2Marker) map.removeLayer(point2Marker);
-                    point2Marker = L.marker([e.latlng.lat, e.latlng.lng], {
-                        icon: L.divIcon({
-                            className: 'custom-marker',
-                            html: '<div style="background: #10b981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>'
-                        })
-                    }).addTo(map);
+      // step4 inputs
+      byId("shipWarehouse").addEventListener("change", () => updateButtons());
+      byId("shipWarehouseOther").addEventListener("input", (e)=> state.shipWarehouseOther = e.target.value);
 
-                    point2Marker.bindPopup("Точка 2: Место хранения").openPopup();
+      byId("contactName").addEventListener("input", () => updateButtons());
+      byId("contactPhone").addEventListener("input", () => updateButtons());
+      byId("commentFinal").addEventListener("input", () => {});
 
-                    // Рисование линии между точками
-                    if (state.points.point1 && state.points.point2) {
-                        L.polyline([
-                            [state.points.point1.lat, state.points.point1.lng],
-                            [state.points.point2.lat, state.points.point2.lng]
-                        ], {
-                            color: '#4f46e5',
-                            weight: 3,
-                            opacity: 0.7,
-                            dashArray: '10, 10'
-                        }).addTo(map);
-                    }
-                }
-            });
+      // navigation
+      byId("next1").addEventListener("click", () => showStep(2));
+      byId("prev2").addEventListener("click", () => showStep(1));
+      byId("next2").addEventListener("click", () => showStep(3));
+      byId("prev3").addEventListener("click", () => showStep(2));
+      byId("next3").addEventListener("click", () => showStep(4));
+      byId("prev4").addEventListener("click", () => showStep(3));
+
+      // submit
+      byId("submit").addEventListener("click", () => {
+        // collect step2 final values
+        state.dims.len = Number(byId("len").value || 0);
+        state.dims.wid = Number(byId("wid").value || 0);
+        state.dims.hei = Number(byId("hei").value || 0);
+        state.dims.unit = (byId("unit").value || "").trim();
+
+        state.delivery = (byId("delivery").value || "").trim();
+        state.deliveryOther = (byId("deliveryOther").value || "").trim();
+
+        state.shipWarehouse = (byId("shipWarehouse").value || "").trim();
+
+        state.contact.name = (byId("contactName").value || "").trim();
+        state.contact.phone = (byId("contactPhone").value || "").trim();
+        state.contact.comment = (byId("commentFinal").value || "").trim();
+
+        updateButtons();
+        if (byId("submit").disabled) return;
+
+        const payload = buildPayload();
+        const orderId = `ORD-${Math.floor(100000 + Math.random()*900000)}`;
+        const sql = buildSqlInsert(orderId, payload);
+
+        // показать “принято” + SQL
+        showAccepted(orderId, sql);
+
+        // отправка в Telegram Mini App (в bot: web_app_data)
+        if (tg) {
+          tg.sendData(JSON.stringify({ order_id: orderId, payload, sql }));
+        } else {
+          console.log("PAYLOAD:", payload);
+          console.log("SQL:", sql);
         }
+      });
+    }
 
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            // Категории товара
-            document.querySelectorAll('.category-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const category = this.dataset.category;
-                    const checkbox = this.querySelector('.custom-checkbox');
-
-                    // Сброс других категорий
-                    document.querySelectorAll('.category-item').forEach(cat => {
-                        cat.classList.remove('selected');
-                        cat.querySelector('.custom-checkbox').classList.remove('checked');
-                    });
-
-                    // Выбор текущей категории
-                    this.classList.add('selected');
-                    checkbox.classList.add('checked');
-                    state.selectedCategory = category;
-
-                    updateButtons();
-                });
-            });
-
-            // Дополнительные услуги
-            document.querySelectorAll('.service-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const service = this.dataset.service;
-                    const checkbox = this.querySelector('.custom-checkbox');
-
-                    checkbox.classList.toggle('checked');
-
-                    if (checkbox.classList.contains('checked')) {
-                        if (!state.services.includes(service)) {
-                            state.services.push(service);
-                        }
-                    } else {
-                        state.services = state.services.filter(s => s !== service);
-                    }
-                });
-            });
-
-            // Поля ввода
-            document.getElementById('quantity').addEventListener('input', function() {
-                state.quantity = parseInt(this.value) || 1;
-                updateButtons();
-            });
-
-            document.getElementById('size').addEventListener('change', function() {
-                state.size = this.value;
-                updateButtons();
-            });
-
-            document.getElementById('warehouse').addEventListener('change', function() {
-                state.warehouse = this.value;
-                updateButtons();
-            });
-
-            // Кнопки навигации
-            document.getElementById('next1').addEventListener('click', () => nextStep(2));
-            document.getElementById('next2').addEventListener('click', () => nextStep(3));
-            document.getElementById('next3').addEventListener('click', () => nextStep(4));
-
-            document.getElementById('prev2').addEventListener('click', () => prevStep(1));
-            document.getElementById('prev3').addEventListener('click', () => prevStep(2));
-            document.getElementById('prev4').addEventListener('click', () => prevStep(3));
-
-            // Отправка формы
-            document.getElementById('submit').addEventListener('click', submitForm);
-
-            // Новая заявка
-            document.getElementById('newOrder').addEventListener('click', resetForm);
-        }
-
-        // Обновление состояния кнопок
-        function updateButtons() {
-            const nextButtons = document.querySelectorAll('.btn-next');
-
-            nextButtons.forEach(btn => {
-                if (state.currentStep === 1) {
-                    btn.disabled = !state.selectedCategory;
-                } else if (state.currentStep === 2) {
-                    btn.disabled = !state.size || state.quantity < 1;
-                } else if (state.currentStep === 4) {
-                    btn.disabled = !state.warehouse || !state.points.point1 || !state.points.point2;
-                }
-            });
-
-            document.getElementById('submit').disabled = !state.warehouse || !state.points.point1 || !state.points.point2;
-        }
-
-        // Переход к следующему шагу
-        function nextStep(step) {
-            // Анимация выхода текущего шага
-            const currentStepEl = document.getElementById(`step${state.currentStep}`);
-            currentStepEl.style.animation = 'slideOut 0.5s ease forwards';
-
-            setTimeout(() => {
-                // Скрыть текущий шаг
-                currentStepEl.classList.remove('active');
-
-                // Показать следующий шаг
-                const nextStepEl = document.getElementById(`step${step}`);
-                nextStepEl.classList.add('active');
-                nextStepEl.style.animation = 'slideIn 0.5s ease forwards';
-
-                // Обновить индикатор прогресса
-                document.querySelectorAll('.progress-step').forEach(stepEl => {
-                    const stepNum = parseInt(stepEl.dataset.step);
-                    stepEl.classList.remove('active');
-
-                    if (stepNum < step) {
-                        stepEl.classList.add('completed');
-                    } else if (stepNum === step) {
-                        stepEl.classList.add('active');
-                    } else {
-                        stepEl.classList.remove('completed');
-                    }
-                });
-
-                state.currentStep = step;
-                updateButtons();
-
-                // Если переходим к шагу с картой, перерисовываем её
-                if (step === 4) {
-                    setTimeout(() => {
-                        map.invalidateSize();
-                    }, 100);
-                }
-            }, 500);
-        }
-
-        // Возврат к предыдущему шагу
-        function prevStep(step) {
-            // Анимация выхода текущего шага
-            const currentStepEl = document.getElementById(`step${state.currentStep}`);
-            currentStepEl.style.animation = 'slideOut 0.5s ease reverse forwards';
-
-            setTimeout(() => {
-                // Скрыть текущий шаг
-                currentStepEl.classList.remove('active');
-
-                // Показать предыдущий шаг
-                const prevStepEl = document.getElementById(`step${step}`);
-                prevStepEl.classList.add('active');
-                prevStepEl.style.animation = 'slideIn 0.5s ease reverse forwards';
-
-                // Обновить индикатор прогресса
-                document.querySelectorAll('.progress-step').forEach(stepEl => {
-                    const stepNum = parseInt(stepEl.dataset.step);
-                    stepEl.classList.remove('active');
-
-                    if (stepNum < step) {
-                        stepEl.classList.add('completed');
-                    } else if (stepNum === step) {
-                        stepEl.classList.add('active');
-                    } else {
-                        stepEl.classList.remove('completed');
-                    }
-                });
-
-                state.currentStep = step;
-                updateButtons();
-            }, 500);
-        }
-
-        // Отправка формы
-        function submitForm() {
-            // Собираем все данные
-            const formData = {
-                category: state.selectedCategory,
-                quantity: state.quantity,
-                size: state.size,
-                services: state.services,
-                warehouse: state.warehouse,
-                points: state.points,
-                timestamp: new Date().toISOString()
-            };
-
-            // Генерация ID заявки
-            const orderId = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('orderId').textContent = orderId;
-
-            // Переход к экрану завершения
-            const currentStepEl = document.getElementById(`step${state.currentStep}`);
-            currentStepEl.style.animation = 'slideOut 0.5s ease forwards';
-
-            setTimeout(() => {
-                currentStepEl.classList.remove('active');
-
-                // Показать экран завершения
-                const completionEl = document.getElementById('completion');
-                completionEl.classList.add('active');
-                completionEl.style.animation = 'fadeIn 0.8s ease forwards';
-
-                // Отправка данных в Telegram бот
-                sendToTelegramBot(formData, orderId);
-            }, 500);
-
-            console.log('Отправленные данные:', formData);
-        }
-
-        // Отправка данных в Telegram бот
-        function sendToTelegramBot(formData, orderId) {
-            // В реальном приложении здесь будет отправка данных на сервер
-            // или прямой вызов Telegram Bot API
-
-            // Имитация отправки
-            setTimeout(() => {
-                console.log('Данные отправлены в Telegram бот:', {
-                    ...formData,
-                    orderId: `ORD-${orderId}`
-                });
-
-                // Здесь можно добавить реальный запрос к API
-                // fetch('YOUR_BOT_API_ENDPOINT', {
-                //     method: 'POST',
-                //     headers: {'Content-Type': 'application/json'},
-                //     body: JSON.stringify(formData)
-                // });
-            }, 1000);
-        }
-
-        // Сброс формы для новой заявки
-        function resetForm() {
-            // Сброс состояния
-            state.currentStep = 1;
-            state.selectedCategory = null;
-            state.quantity = 1;
-            state.size = '';
-            state.services = [];
-            state.warehouse = '';
-            state.points = {
-                point1: null,
-                point2: null
-            };
-
-            // Сброс UI
-            document.querySelectorAll('.category-item').forEach(item => {
-                item.classList.remove('selected');
-                item.querySelector('.custom-checkbox').classList.remove('checked');
-            });
-
-            document.getElementById('quantity').value = 1;
-            document.getElementById('size').value = '';
-            document.getElementById('warehouse').value = '';
-
-            document.querySelectorAll('.service-item').forEach(item => {
-                item.querySelector('.custom-checkbox').classList.remove('checked');
-            });
-
-            // Очистка карты
-            if (point1Marker) map.removeLayer(point1Marker);
-            if (point2Marker) map.removeLayer(point2Marker);
-            point1Marker = null;
-            point2Marker = null;
-
-            // Сброс шагов
-            document.querySelectorAll('.form-step').forEach(step => {
-                step.classList.remove('active');
-                step.style.animation = '';
-            });
-
-            document.getElementById('step1').classList.add('active');
-
-            // Сброс индикатора прогресса
-            document.querySelectorAll('.progress-step').forEach((stepEl, index) => {
-                stepEl.classList.remove('active', 'completed');
-                if (index === 0) stepEl.classList.add('active');
-            });
-
-            updateButtons();
-        }
-    </script>
+    // ========= Init =========
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      setupEventListeners();
+      updateButtons();
+    });
+  </script>
 </body>
 </html>
+
+
