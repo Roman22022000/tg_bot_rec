@@ -1039,12 +1039,12 @@
         showAccepted(orderId, sql);
 
         // send to Telegram WebApp
-        if (tg) {
-          tg.sendData(JSON.stringify({ order_id: orderId, payload, sql }));
-        } else {
-          console.log("PAYLOAD:", payload);
-          console.log("SQL:", sql);
-        }
+       if (tg) {
+  tg.sendData(JSON.stringify({ order_id: orderId, payload, sql }));
+} else {
+  console.log("Откройте через Telegram Mini App, чтобы отправить в бота.");
+}
+
       });
     }
 
@@ -1056,6 +1056,7 @@
   </script>
 </body>
 </html>
+
 
 
 
