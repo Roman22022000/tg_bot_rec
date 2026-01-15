@@ -10,7 +10,6 @@
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
-
     :root{
       --primary:#4f46e5;
       --primary-light:#818cf8;
@@ -28,19 +27,40 @@
 
       --border-radius:12px;
       --border-radius-sm:8px;
-      --box-shadow:0 10px 25px rgba(0,0,0,0.05);
+      --box-shadow:0 10px 25px rgba(0,0,0,0.06);
       --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
     }
 
+    html{scroll-behavior:smooth}
     body{
       background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
       min-height:100vh;
       display:flex;
       justify-content:center;
-      align-items:center;
+      align-items:flex-start;     /* важно для скролла */
       padding:16px;
       color:var(--gray-900);
-      overflow:hidden;
+      overflow-y:auto;            /* включаем вертикальный скролл */
+      overflow-x:hidden;
+    }
+
+    /* легкая динамика фона */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-40px;
+      background:
+        radial-gradient(700px 450px at 12% 18%, rgba(79,70,229,.18), transparent 55%),
+        radial-gradient(650px 430px at 90% 22%, rgba(16,185,129,.14), transparent 55%),
+        radial-gradient(900px 550px at 55% 90%, rgba(129,140,248,.18), transparent 60%);
+      filter:saturate(1.05);
+      animation: drift 14s ease-in-out infinite alternate;
+      pointer-events:none;
+      z-index:-1;
+    }
+    @keyframes drift{
+      from{transform:translate3d(0,0,0) scale(1)}
+      to{transform:translate3d(18px,-10px,0) scale(1.03)}
     }
 
     .container{
@@ -51,24 +71,28 @@
       box-shadow:var(--box-shadow);
       overflow:hidden;
       border:1px solid var(--gray-200);
-      position:relative;
+
+      /* чтобы не резало на маленьких экранах */
+      max-height: calc(100vh - 32px);
+      display:flex;
+      flex-direction:column;
     }
 
     .header{
       background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
       color:var(--white);
-      padding:24px;
+      padding:22px 20px;
       text-align:center;
       position:relative;
       overflow:hidden;
+      flex: 0 0 auto;
     }
     .header::before{
       content:'';
       position:absolute;
       inset:-60%;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
-      background-size:20px 20px;
+      background: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+      background-size: 20px 20px;
       animation: float 20s linear infinite;
     }
     @keyframes float{
@@ -77,22 +101,23 @@
     }
     .header-content{position:relative;z-index:2}
     .header h1{
-      font-size:1.5rem;
-      font-weight:700;
+      font-size:1.35rem;
+      font-weight:800;
       margin-bottom:8px;
       display:flex;
       align-items:center;
       justify-content:center;
       gap:10px;
     }
-    .header p{opacity:.9;font-size:.9rem}
+    .header p{opacity:.92;font-size:.92rem}
 
     .progress-bar{
       display:flex;
       justify-content:center;
-      padding:20px 24px 0;
+      padding:16px 20px 0;
       gap:8px;
       background:var(--white);
+      flex: 0 0 auto;
     }
     .progress-step{
       width:32px;height:32px;
@@ -102,7 +127,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:700;
+      font-weight:800;
       font-size:.9rem;
       transition:var(--transition);
       position:relative;
@@ -113,37 +138,35 @@
     .progress-step::after{
       content:'';
       position:absolute;
-      top:50%;
-      left:100%;
+      top:50%;left:100%;
       width:16px;height:2px;
       background:var(--gray-200);
       transform:translateY(-50%);
     }
     .progress-step:last-child::after{display:none}
 
+    /* скролл внутри формы */
     .form-container{
-      padding:24px;
+      padding:20px;
       position:relative;
-      min-height: 560px;
+
+      flex: 1 1 auto;
+      min-height: 0;       /* важно для flex+scroll */
+      overflow-y:auto;     /* скролл вниз */
+      overflow-x:hidden;
+      background:var(--white);
     }
 
     .form-step{display:none;animation:slideIn .5s ease forwards}
     .form-step.active{display:block}
-
-    @keyframes slideIn{
-      from{opacity:0;transform:translateX(30px)}
-      to{opacity:1;transform:translateX(0)}
-    }
-    @keyframes slideOut{
-      from{opacity:1;transform:translateX(0)}
-      to{opacity:0;transform:translateX(-30px)}
-    }
+    @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-30px)}}
 
     .step-title{
-      font-size:1.2rem;
-      font-weight:800;
+      font-size:1.12rem;
+      font-weight:900;
       color:var(--gray-900);
-      margin-bottom:16px;
+      margin-bottom:14px;
       display:flex;
       align-items:center;
       gap:10px;
@@ -153,18 +176,16 @@
     .category-grid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
-      gap:16px;
-      margin-bottom:18px;
+      gap:14px;
+      margin-bottom:14px;
     }
-    @media (max-width:480px){
-      .category-grid{grid-template-columns:1fr}
-    }
+    @media (max-width:480px){ .category-grid{grid-template-columns:1fr} }
 
     .category-item{
       background:var(--light-bg);
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
-      padding:18px;
+      padding:16px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -184,20 +205,20 @@
       background:rgba(79,70,229,.06);
     }
     .category-icon{
-      width:56px;height:56px;
+      width:54px;height:54px;
       background:linear-gradient(135deg,var(--primary-light),var(--primary));
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
-      margin-bottom:12px;
-      color:white;
-      font-size:1.5rem;
+      margin-bottom:10px;
+      color:#fff;
+      font-size:1.35rem;
     }
-    .category-name{font-weight:800;margin-bottom:6px;color:var(--gray-900)}
+    .category-name{font-weight:900;margin-bottom:6px;color:var(--gray-900)}
     .category-desc{font-size:.85rem;color:var(--gray-700);line-height:1.35}
 
-    .checkbox-wrapper{position:absolute;top:12px;right:12px}
+    .checkbox-wrapper{position:absolute;top:10px;right:10px}
     .custom-checkbox{
       width:22px;height:22px;
       border:2px solid var(--gray-300);
@@ -205,10 +226,8 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      cursor:pointer;
       transition:var(--transition);
       background:#fff;
-      flex: 0 0 auto;
     }
     .custom-checkbox.checked{background:var(--primary);border-color:var(--primary)}
     .custom-checkbox.checked::after{content:'✓';color:#fff;font-weight:900;font-size:14px}
@@ -216,19 +235,19 @@
     .input-group{margin-bottom:14px}
     .input-group label{
       display:block;
-      font-weight:800;
+      font-weight:900;
       margin-bottom:8px;
       color:var(--gray-900);
-      font-size: .95rem;
+      font-size:.95rem;
     }
     .input-group input, .input-group select, .input-group textarea{
       width:100%;
-      padding:14px 16px;
+      padding:13px 14px;
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
       font-size:1rem;
       transition:var(--transition);
-      background:var(--white);
+      background:#fff;
     }
     .input-group textarea{min-height:86px;resize:vertical}
     .input-group input:focus, .input-group select:focus, .input-group textarea:focus{
@@ -242,16 +261,9 @@
       grid-template-columns: 1fr 1fr 1fr;
       gap:12px;
     }
-    @media (max-width:480px){
-      .row3{grid-template-columns:1fr}
-    }
+    @media (max-width:480px){ .row3{grid-template-columns:1fr} }
 
-    .services-grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      margin-bottom:16px;
-    }
+    .services-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:10px}
     .service-item{
       display:flex;
       align-items:center;
@@ -275,13 +287,13 @@
       color:var(--primary);
       font-size:1.05rem;
     }
-    .service-name{font-weight:800;color:var(--gray-900)}
+    .service-name{font-weight:900;color:var(--gray-900)}
 
     .map-container{
-      height:300px;
+      height:280px;
       border-radius:var(--border-radius-sm);
       overflow:hidden;
-      margin-bottom:16px;
+      margin-bottom:14px;
       border:2px solid var(--gray-200);
       position:relative;
       background:#fff;
@@ -289,18 +301,18 @@
     #map{height:100%;width:100%}
     .map-instructions{
       position:absolute;
-      top:12px;left:12px;right:12px;
+      top:10px;left:10px;right:10px;
       background:rgba(255,255,255,.95);
       padding:10px 12px;
       border-radius:var(--border-radius-sm);
-      font-size:.9rem;
+      font-size:.88rem;
       z-index:1000;
       box-shadow:0 4px 12px rgba(0,0,0,.1);
       display:flex;
       flex-direction:column;
       gap:6px;
     }
-    .map-point{display:flex;align-items:center;gap:8px;font-weight:700}
+    .map-point{display:flex;align-items:center;gap:8px;font-weight:800}
     .point-indicator{
       width:14px;height:14px;border-radius:50%;
       border:3px solid #fff;
@@ -308,18 +320,24 @@
     .point-1{background:var(--primary)}
     .point-2{background:var(--secondary)}
 
+    /* панели кнопок — доступны при скролле */
     .controls{
       display:flex;
       justify-content:space-between;
-      margin-top:20px;
-      padding-top:18px;
-      border-top:1px solid var(--gray-200);
       gap:12px;
+      margin-top:16px;
+      padding-top:14px;
+      border-top:1px solid var(--gray-200);
+      background:#fff;
+      position:relative; /* не fixed */
+    }
+    @media (max-width:480px){
+      .controls{flex-direction:column}
     }
     .btn{
-      padding:14px 18px;
+      padding:13px 16px;
       border-radius:var(--border-radius-sm);
-      font-weight:800;
+      font-weight:900;
       font-size:1rem;
       cursor:pointer;
       transition:var(--transition);
@@ -348,22 +366,24 @@
     }
     .btn:disabled{opacity:.6;cursor:not-allowed;transform:none !important;box-shadow:none !important}
 
-    /* Экран “принято” + анимация градиента */
+    .tiny{font-size:.85rem;color:var(--gray-700);line-height:1.4}
+
+    /* overlay “запрос принят” */
     .accept-overlay{
       position:absolute;
       inset:0;
       display:none;
       align-items:center;
       justify-content:center;
-      padding:24px;
-      background: rgba(255,255,255,.85);
+      padding:20px;
+      background: rgba(255,255,255,.86);
       backdrop-filter: blur(6px);
-      z-index: 50;
+      z-index:50;
     }
     .accept-overlay.show{display:flex}
     .accept-card{
       width:100%;
-      max-width: 420px;
+      max-width: 440px;
       border-radius: var(--border-radius);
       border: 1px solid var(--gray-200);
       overflow:hidden;
@@ -376,7 +396,6 @@
       background: linear-gradient(120deg, #4f46e5, #06b6d4, #10b981, #818cf8);
       background-size: 300% 300%;
       animation: gradMove 3.2s ease-in-out infinite;
-      position:relative;
     }
     @keyframes gradMove{
       0%{background-position:0% 50%}
@@ -385,9 +404,9 @@
     }
     .accept-top h3{
       display:flex;align-items:center;gap:10px;
-      font-size:1.15rem;font-weight:900;
-      margin:0;
+      font-size:1.12rem;font-weight:900;margin:0;
     }
+    .accept-top .tiny{color:rgba(255,255,255,.92);margin-top:6px}
     .accept-body{padding:16px}
     .accept-body p{color:var(--gray-700);line-height:1.5;margin:0 0 12px}
     .sql-box{
@@ -400,6 +419,8 @@
       color:var(--gray-900);
       white-space:pre-wrap;
       word-break:break-word;
+      max-height: 220px;
+      overflow:auto;
     }
     .accept-actions{
       display:flex; gap:10px; padding: 0 16px 16px;
@@ -416,12 +437,9 @@
     }
     .mini-btn:hover{transform:translateY(-1px)}
     .mini-btn.primary{
-      border:none;
-      color:#fff;
+      border:none;color:#fff;
       background: linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
     }
-
-    .tiny{font-size:.85rem;color:var(--gray-700)}
   </style>
 </head>
 
@@ -430,7 +448,7 @@
     <div class="header">
       <div class="header-content">
         <h1><i class="fas fa-boxes"></i> Форма заявки на товар</h1>
-        <p>Заполните форму для оформления запроса</p>
+        <p>Категория → Размеры → Услуги → Склад/Карта/Контакты → SQL</p>
       </div>
     </div>
 
@@ -442,7 +460,7 @@
     </div>
 
     <div class="form-container">
-      <!-- overlay “принято” -->
+      <!-- overlay -->
       <div class="accept-overlay" id="acceptOverlay">
         <div class="accept-card">
           <div class="accept-top">
@@ -450,7 +468,7 @@
             <div class="tiny" id="acceptSub">ID: —</div>
           </div>
           <div class="accept-body">
-            <p>Данные сформированы. Ниже SQL для записи в базу (пример).</p>
+            <p>SQL (пример) для записи результата после “Отправка запроса”:</p>
             <div class="sql-box" id="sqlBox"></div>
           </div>
           <div class="accept-actions">
@@ -462,7 +480,7 @@
 
       <!-- STEP 1 -->
       <div class="form-step active" id="step1">
-        <h2 class="step-title"><i class="fas fa-list"></i> Категория товара + “Другое”</h2>
+        <h2 class="step-title"><i class="fas fa-list"></i> Категория товара + Другое</h2>
 
         <div class="category-grid">
           <div class="category-item" data-category="1">
@@ -471,35 +489,30 @@
             <div class="category-desc">Электроника</div>
             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
           </div>
-
           <div class="category-item" data-category="2">
             <div class="category-icon"><i class="fas fa-tshirt"></i></div>
             <div class="category-name">Категория 2</div>
             <div class="category-desc">Одежда</div>
             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
           </div>
-
           <div class="category-item" data-category="3">
             <div class="category-icon"><i class="fas fa-book"></i></div>
             <div class="category-name">Категория 3</div>
             <div class="category-desc">Книги</div>
             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
           </div>
-
           <div class="category-item" data-category="4">
             <div class="category-icon"><i class="fas fa-home"></i></div>
             <div class="category-name">Категория 4</div>
             <div class="category-desc">Для дома</div>
             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
           </div>
-
           <div class="category-item" data-category="5">
             <div class="category-icon"><i class="fas fa-dumbbell"></i></div>
             <div class="category-name">Категория 5</div>
             <div class="category-desc">Спорт</div>
             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
           </div>
-
           <div class="category-item" data-category="6">
             <div class="category-icon"><i class="fas fa-car"></i></div>
             <div class="category-name">Категория 6</div>
@@ -516,15 +529,14 @@
         <div class="controls">
           <div></div>
           <button class="btn btn-next" id="next1">
-            <span>Далее</span>
-            <i class="fas fa-arrow-right"></i>
+            <span>Далее</span><i class="fas fa-arrow-right"></i>
           </button>
         </div>
       </div>
 
       <!-- STEP 2 -->
       <div class="form-step" id="step2">
-        <h2 class="step-title"><i class="fas fa-cube"></i> Количество + Размеры (Д×Ш×В) + Доставка</h2>
+        <h2 class="step-title"><i class="fas fa-cube"></i> Количество + Размеры + Доставка</h2>
 
         <div class="input-group">
           <label for="quantity"><i class="fas fa-boxes"></i> Количество товара</label>
@@ -564,11 +576,15 @@
           <button class="btn btn-prev" id="prev2"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
           <button class="btn btn-next" id="next2"><span>Далее</span><i class="fas fa-arrow-right"></i></button>
         </div>
+
+        <div class="tiny" style="margin-top:10px;">
+          Чтобы перейти далее: заполните количество, длина/ширина/высота, единицу измерения и выберите доставку.
+        </div>
       </div>
 
       <!-- STEP 3 -->
       <div class="form-step" id="step3">
-        <h2 class="step-title"><i class="fas fa-concierge-bell"></i> Доп. услуги + “Другое”</h2>
+        <h2 class="step-title"><i class="fas fa-concierge-bell"></i> Доп. услуги + Другое</h2>
 
         <div class="services-grid">
           <div class="service-item" data-service="packaging">
@@ -613,8 +629,8 @@
         </div>
 
         <div class="input-group">
-          <label for="servicesOther"><i class="fas fa-pen"></i> Другое (доп. услуги / уточнение)</label>
-          <input id="servicesOther" type="text" placeholder="Например: доп. упаковка, паллетирование..." />
+          <label for="servicesOther"><i class="fas fa-pen"></i> Другое (услуги / уточнение)</label>
+          <input id="servicesOther" type="text" placeholder="Например: паллетирование, усиленная упаковка..." />
         </div>
 
         <div class="controls">
@@ -625,7 +641,7 @@
 
       <!-- STEP 4 -->
       <div class="form-step" id="step4">
-        <h2 class="step-title"><i class="fas fa-map-marked-alt"></i> Отгрузка на склад + Карта (2 точки) + Контакты</h2>
+        <h2 class="step-title"><i class="fas fa-map-marked-alt"></i> Склад + Карта + Контакты</h2>
 
         <div class="input-group">
           <label for="shipWarehouse"><i class="fas fa-warehouse"></i> Отгрузка на какой склад</label>
@@ -640,14 +656,14 @@
 
         <div class="input-group">
           <label for="shipWarehouseOther"><i class="fas fa-pen"></i> Другое (склад / уточнение)</label>
-          <input id="shipWarehouseOther" type="text" placeholder="Например: адрес склада, номер ворот, примечание..." />
+          <input id="shipWarehouseOther" type="text" placeholder="Адрес, номер склада, примечания..." />
         </div>
 
         <div class="map-container">
           <div class="map-instructions">
             <div class="map-point"><div class="point-indicator point-1"></div><span>Точка 1: место товара</span></div>
             <div class="map-point"><div class="point-indicator point-2"></div><span>Точка 2: место хранения</span></div>
-            <small>Кликните по карте 2 раза. Третий клик — сброс.</small>
+            <small>2 клика = 2 точки. Третий клик — сброс.</small>
           </div>
           <div id="map"></div>
         </div>
@@ -672,8 +688,8 @@
           <button class="btn btn-submit" id="submit"><span>Отправка запроса</span><i class="fas fa-paper-plane"></i></button>
         </div>
 
-        <div class="tiny" style="margin-top:10px;color:var(--gray-700);">
-          После отправки: “Запрос принят” + SQL (пример) + отправка данных в Telegram WebApp.
+        <div class="tiny" style="margin-top:10px;">
+          Для отправки: выберите склад, поставьте 2 точки на карте, заполните имя и номер.
         </div>
       </div>
 
@@ -684,11 +700,11 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-    // ========= Telegram WebApp (optional) =========
+    // Telegram WebApp (если открыто внутри Telegram)
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
     if (tg) { tg.ready(); tg.expand(); }
 
-    // ========= State =========
+    // State
     const state = {
       currentStep: 1,
       selectedCategory: null,
@@ -711,7 +727,7 @@
       contact: { name: "", phone: "", comment: "" },
     };
 
-    // ========= Map (Leaflet) =========
+    // Leaflet map
     let map = null;
     let point1Marker = null;
     let point2Marker = null;
@@ -735,6 +751,7 @@
               html: '<div style="background:#4f46e5;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>'
             })
           }).addTo(map).bindPopup("Точка 1: место товара").openPopup();
+          updateButtons();
           return;
         }
 
@@ -753,11 +770,13 @@
             [[state.points.point1.lat, state.points.point1.lng], [state.points.point2.lat, state.points.point2.lng]],
             { color:"#4f46e5", weight:3, opacity:.7, dashArray:"10,10" }
           ).addTo(map);
+
+          updateButtons();
           return;
         }
 
-        // third click -> reset
-        resetMapPoints();
+        resetMapPoints(); // 3-й клик — сброс
+        updateButtons();
       });
     }
 
@@ -769,8 +788,8 @@
       if (line) { map.removeLayer(line); line = null; }
     }
 
-    // ========= UI Helpers =========
-    function byId(id){ return document.getElementById(id); }
+    // DOM helpers
+    const $ = (id) => document.getElementById(id);
 
     function setProgress(step) {
       document.querySelectorAll(".progress-step").forEach(el => {
@@ -783,65 +802,68 @@
     }
 
     function showStep(step) {
-      const cur = byId(`step${state.currentStep}`);
-      const nxt = byId(`step${step}`);
+      const cur = $(`step${state.currentStep}`);
+      const nxt = $(`step${step}`);
       if (!cur || !nxt) return;
 
-      cur.style.animation = "slideOut 0.5s ease forwards";
+      cur.style.animation = "slideOut 0.45s ease forwards";
       setTimeout(() => {
         cur.classList.remove("active");
         cur.style.animation = "";
         nxt.classList.add("active");
-        nxt.style.animation = "slideIn 0.5s ease forwards";
+        nxt.style.animation = "slideIn 0.45s ease forwards";
 
         state.currentStep = step;
         setProgress(step);
 
-        // Leaflet needs invalidate on show
-        if (step === 4) setTimeout(() => map && map.invalidateSize(), 100);
+        // Важно для Leaflet при появлении карты
+        if (step === 4) setTimeout(() => map && map.invalidateSize(), 120);
 
         updateButtons();
-      }, 450);
+
+        // Автоскролл вверх внутри form-container, чтобы видеть заголовок шага
+        document.querySelector(".form-container").scrollTop = 0;
+      }, 420);
     }
 
     function updateButtons() {
-      // step1: category required
+      // Step 1: category required
       if (state.currentStep === 1) {
-        byId("next1").disabled = !state.selectedCategory;
+        $("next1").disabled = !state.selectedCategory;
       }
-      // step2: quantity + dims + delivery required
+
+      // Step 2: qty + dims + unit + delivery required
       if (state.currentStep === 2) {
-        const okQty = Number(byId("quantity").value) >= 1;
-        const len = Number(byId("len").value);
-        const wid = Number(byId("wid").value);
-        const hei = Number(byId("hei").value);
-        const unit = (byId("unit").value || "").trim();
-        const del = (byId("delivery").value || "").trim();
-        byId("next2").disabled = !(okQty && len > 0 && wid > 0 && hei > 0 && unit && del);
+        const qty = Number($("quantity").value || 0);
+        const len = Number($("len").value || 0);
+        const wid = Number($("wid").value || 0);
+        const hei = Number($("hei").value || 0);
+        const unit = ($("unit").value || "").trim();
+        const delivery = ($("delivery").value || "").trim();
+        $("next2").disabled = !(qty >= 1 && len > 0 && wid > 0 && hei > 0 && unit && delivery);
       }
-      // step3: nothing mandatory
+
+      // Step 3: always allowed
       if (state.currentStep === 3) {
-        byId("next3").disabled = false;
+        $("next3").disabled = false;
       }
-      // step4: shipWarehouse + 2 points + name + phone required
+
+      // Step 4: warehouse + 2 points + name + phone
       if (state.currentStep === 4) {
-        const wh = (byId("shipWarehouse").value || "").trim();
+        const wh = ($("shipWarehouse").value || "").trim();
         const hasPoints = !!state.points.point1 && !!state.points.point2;
-        const name = (byId("contactName").value || "").trim();
-        const phone = (byId("contactPhone").value || "").trim();
-        byId("submit").disabled = !(wh && hasPoints && name && phone);
+        const name = ($("contactName").value || "").trim();
+        const phone = ($("contactPhone").value || "").trim();
+        $("submit").disabled = !(wh && hasPoints && name && phone);
       }
     }
 
-    // ========= Data -> SQL =========
+    // SQL
     function sqlEscape(str) {
       if (str === null || str === undefined) return "";
       return String(str).replace(/\\/g, "\\\\").replace(/'/g, "''");
     }
-
-    function toJson(value) {
-      return JSON.stringify(value ?? null);
-    }
+    function toJson(value) { return JSON.stringify(value ?? null); }
 
     function buildPayload() {
       return {
@@ -849,7 +871,7 @@
         category_other: state.categoryOther,
 
         quantity: state.quantity,
-        dimensions: state.dims, // len/wid/hei/unit
+        dimensions: state.dims,
 
         delivery: state.delivery,
         delivery_other: state.deliveryOther,
@@ -872,70 +894,46 @@
     }
 
     function buildSqlInsert(orderId, payload) {
-      // пример таблицы: orders
-      // поля можно менять под вашу БД
       const p = payload;
-
       const cols = [
-        "order_id",
-        "category",
-        "category_other",
-        "quantity",
-        "len",
-        "wid",
-        "hei",
-        "unit",
-        "delivery",
-        "delivery_other",
-        "services_json",
-        "services_other",
-        "ship_warehouse",
-        "ship_warehouse_other",
-        "point1_json",
-        "point2_json",
-        "contact_name",
-        "contact_phone",
-        "comment",
+        "order_id","category","category_other",
+        "quantity","len","wid","hei","unit",
+        "delivery","delivery_other",
+        "services_json","services_other",
+        "ship_warehouse","ship_warehouse_other",
+        "point1_json","point2_json",
+        "contact_name","contact_phone","comment",
         "created_at"
       ];
-
       const values = [
         `'${sqlEscape(orderId)}'`,
         `'${sqlEscape(p.category)}'`,
         `'${sqlEscape(p.category_other)}'`,
         Number(p.quantity || 0),
-
         Number(p.dimensions?.len || 0),
         Number(p.dimensions?.wid || 0),
         Number(p.dimensions?.hei || 0),
         `'${sqlEscape(p.dimensions?.unit || "")}'`,
-
         `'${sqlEscape(p.delivery)}'`,
         `'${sqlEscape(p.delivery_other)}'`,
-
         `'${sqlEscape(toJson(p.services))}'`,
         `'${sqlEscape(p.services_other)}'`,
-
         `'${sqlEscape(p.ship_warehouse)}'`,
         `'${sqlEscape(p.ship_warehouse_other)}'`,
-
         `'${sqlEscape(toJson(p.point1))}'`,
         `'${sqlEscape(toJson(p.point2))}'`,
-
         `'${sqlEscape(p.contact_name)}'`,
         `'${sqlEscape(p.contact_phone)}'`,
         `'${sqlEscape(p.comment)}'`,
         `'${sqlEscape(p.ts)}'`
       ];
-
-      return `INSERT INTO orders (${cols.join(", ")})
-VALUES (${values.join(", ")});`;
+      return `INSERT INTO orders (${cols.join(", ")})\nVALUES (${values.join(", ")});`;
     }
 
-    // ========= Overlay =========
-    const overlay = byId("acceptOverlay");
-    const sqlBox = byId("sqlBox");
-    const acceptSub = byId("acceptSub");
+    // Overlay
+    const overlay = $("acceptOverlay");
+    const sqlBox = $("sqlBox");
+    const acceptSub = $("acceptSub");
 
     function showAccepted(orderId, sql) {
       acceptSub.textContent = `ID: ${orderId}`;
@@ -943,33 +941,26 @@ VALUES (${values.join(", ")});`;
       overlay.classList.add("show");
     }
 
-    byId("closeOverlayBtn").addEventListener("click", () => {
-      overlay.classList.remove("show");
-      // optional: tg.close();
-    });
+    $("closeOverlayBtn").addEventListener("click", () => overlay.classList.remove("show"));
 
-    byId("copySqlBtn").addEventListener("click", async () => {
+    $("copySqlBtn").addEventListener("click", async () => {
       try{
         await navigator.clipboard.writeText(sqlBox.textContent);
-        byId("copySqlBtn").textContent = "Скопировано";
-        setTimeout(()=> byId("copySqlBtn").textContent = "Копировать SQL", 900);
-      }catch{
-        // ignore
-      }
+        $("copySqlBtn").textContent = "Скопировано";
+        setTimeout(()=> $("copySqlBtn").textContent = "Копировать SQL", 900);
+      }catch{}
     });
 
-    // ========= Setup listeners =========
+    // Listeners
     function setupEventListeners() {
-      // category pick (single)
+      // Step1 categories (single)
       document.querySelectorAll(".category-item").forEach(item => {
         item.addEventListener("click", () => {
           const cat = item.dataset.category;
-
           document.querySelectorAll(".category-item").forEach(x => {
             x.classList.remove("selected");
             x.querySelector(".custom-checkbox").classList.remove("checked");
           });
-
           item.classList.add("selected");
           item.querySelector(".custom-checkbox").classList.add("checked");
           state.selectedCategory = cat;
@@ -977,30 +968,26 @@ VALUES (${values.join(", ")});`;
         });
       });
 
-      // step1 other
-      byId("categoryOther").addEventListener("input", (e) => {
-        state.categoryOther = e.target.value;
-      });
+      $("categoryOther").addEventListener("input", (e) => state.categoryOther = e.target.value);
 
-      // step2 fields
-      byId("quantity").addEventListener("input", (e) => {
-        state.quantity = Math.max(1, parseInt(e.target.value || "1", 10));
-        e.target.value = state.quantity;
+      // Step2
+      $("quantity").addEventListener("input", (e) => {
+        const v = Math.max(1, parseInt(e.target.value || "1", 10));
+        e.target.value = v;
+        state.quantity = v;
         updateButtons();
       });
-
       ["len","wid","hei","unit","delivery","deliveryOther"].forEach(id => {
-        byId(id).addEventListener("input", () => updateButtons());
-        byId(id).addEventListener("change", () => updateButtons());
+        $(id).addEventListener("input", updateButtons);
+        $(id).addEventListener("change", updateButtons);
       });
 
-      // step3 services toggle
+      // Step3 services
       document.querySelectorAll(".service-item").forEach(item => {
         item.addEventListener("click", () => {
           const key = item.dataset.service;
           const cb = item.querySelector(".custom-checkbox");
           cb.classList.toggle("checked");
-
           if (cb.classList.contains("checked")) {
             if (!state.services.includes(key)) state.services.push(key);
           } else {
@@ -1008,53 +995,50 @@ VALUES (${values.join(", ")});`;
           }
         });
       });
+      $("servicesOther").addEventListener("input", (e)=> state.servicesOther = e.target.value);
 
-      byId("servicesOther").addEventListener("input", (e)=> state.servicesOther = e.target.value);
+      // Step4
+      $("shipWarehouse").addEventListener("change", updateButtons);
+      $("shipWarehouseOther").addEventListener("input", (e)=> state.shipWarehouseOther = e.target.value);
+      $("contactName").addEventListener("input", updateButtons);
+      $("contactPhone").addEventListener("input", updateButtons);
+      $("commentFinal").addEventListener("input", () => {});
 
-      // step4 inputs
-      byId("shipWarehouse").addEventListener("change", () => updateButtons());
-      byId("shipWarehouseOther").addEventListener("input", (e)=> state.shipWarehouseOther = e.target.value);
+      // Nav
+      $("next1").addEventListener("click", () => showStep(2));
+      $("prev2").addEventListener("click", () => showStep(1));
+      $("next2").addEventListener("click", () => showStep(3));
+      $("prev3").addEventListener("click", () => showStep(2));
+      $("next3").addEventListener("click", () => showStep(4));
+      $("prev4").addEventListener("click", () => showStep(3));
 
-      byId("contactName").addEventListener("input", () => updateButtons());
-      byId("contactPhone").addEventListener("input", () => updateButtons());
-      byId("commentFinal").addEventListener("input", () => {});
+      // Submit
+      $("submit").addEventListener("click", () => {
+        // collect step2
+        state.dims.len = Number($("len").value || 0);
+        state.dims.wid = Number($("wid").value || 0);
+        state.dims.hei = Number($("hei").value || 0);
+        state.dims.unit = ($("unit").value || "").trim();
 
-      // navigation
-      byId("next1").addEventListener("click", () => showStep(2));
-      byId("prev2").addEventListener("click", () => showStep(1));
-      byId("next2").addEventListener("click", () => showStep(3));
-      byId("prev3").addEventListener("click", () => showStep(2));
-      byId("next3").addEventListener("click", () => showStep(4));
-      byId("prev4").addEventListener("click", () => showStep(3));
+        state.delivery = ($("delivery").value || "").trim();
+        state.deliveryOther = ($("deliveryOther").value || "").trim();
 
-      // submit
-      byId("submit").addEventListener("click", () => {
-        // collect step2 final values
-        state.dims.len = Number(byId("len").value || 0);
-        state.dims.wid = Number(byId("wid").value || 0);
-        state.dims.hei = Number(byId("hei").value || 0);
-        state.dims.unit = (byId("unit").value || "").trim();
+        state.shipWarehouse = ($("shipWarehouse").value || "").trim();
 
-        state.delivery = (byId("delivery").value || "").trim();
-        state.deliveryOther = (byId("deliveryOther").value || "").trim();
-
-        state.shipWarehouse = (byId("shipWarehouse").value || "").trim();
-
-        state.contact.name = (byId("contactName").value || "").trim();
-        state.contact.phone = (byId("contactPhone").value || "").trim();
-        state.contact.comment = (byId("commentFinal").value || "").trim();
+        state.contact.name = ($("contactName").value || "").trim();
+        state.contact.phone = ($("contactPhone").value || "").trim();
+        state.contact.comment = ($("commentFinal").value || "").trim();
 
         updateButtons();
-        if (byId("submit").disabled) return;
+        if ($("submit").disabled) return;
 
         const payload = buildPayload();
         const orderId = `ORD-${Math.floor(100000 + Math.random()*900000)}`;
         const sql = buildSqlInsert(orderId, payload);
 
-        // показать “принято” + SQL
         showAccepted(orderId, sql);
 
-        // отправка в Telegram Mini App (в bot: web_app_data)
+        // send to Telegram WebApp
         if (tg) {
           tg.sendData(JSON.stringify({ order_id: orderId, payload, sql }));
         } else {
@@ -1064,7 +1048,6 @@ VALUES (${values.join(", ")});`;
       });
     }
 
-    // ========= Init =========
     document.addEventListener("DOMContentLoaded", () => {
       initMap();
       setupEventListeners();
@@ -1073,5 +1056,6 @@ VALUES (${values.join(", ")});`;
   </script>
 </body>
 </html>
+
 
 
