@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Форма заявки на товар | Telegram Bot</title>
+  <title>Форма заявки | Telegram Mini App</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -13,11 +13,10 @@
     :root{
       --primary:#4f46e5;
       --primary-light:#818cf8;
-      --primary-dark:#3730a3;
       --secondary:#10b981;
 
-      --light-bg:#f8fafc;
       --white:#ffffff;
+      --light-bg:#f8fafc;
 
       --gray-100:#f1f5f9;
       --gray-200:#e2e8f0;
@@ -40,11 +39,10 @@
       align-items:flex-start;     /* важно для скролла */
       padding:16px;
       color:var(--gray-900);
-      overflow-y:auto;            /* включаем вертикальный скролл */
+      overflow-y:auto;            /* вертикальный скролл */
       overflow-x:hidden;
     }
 
-    /* легкая динамика фона */
     body::before{
       content:"";
       position:fixed;
@@ -65,14 +63,13 @@
 
     .container{
       width:100%;
-      max-width:520px;
+      max-width:540px;
       background:var(--white);
       border-radius:var(--border-radius);
       box-shadow:var(--box-shadow);
       overflow:hidden;
       border:1px solid var(--gray-200);
 
-      /* чтобы не резало на маленьких экранах */
       max-height: calc(100vh - 32px);
       display:flex;
       flex-direction:column;
@@ -81,8 +78,7 @@
     .header{
       background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
       color:var(--white);
-      padding:22px 20px;
-      text-align:center;
+      padding:18px 18px 14px;
       position:relative;
       overflow:hidden;
       flex: 0 0 auto;
@@ -94,27 +90,97 @@
       background: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
       background-size: 20px 20px;
       animation: float 20s linear infinite;
+      pointer-events:none;
     }
     @keyframes float{
       0%{transform:translate(0,0) rotate(0deg)}
       100%{transform:translate(-10px,-10px) rotate(360deg)}
     }
     .header-content{position:relative;z-index:2}
+    .titleRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
     .header h1{
-      font-size:1.35rem;
-      font-weight:800;
-      margin-bottom:8px;
+      font-size:1.25rem;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0;
+    }
+    .header p{
+      margin:6px 0 0;
+      opacity:.92;
+      font-size:.9rem;
+    }
+
+    /* Telegram account bar */
+    .tgbar{
+      margin-top:10px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 10px;
+      padding:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .tgleft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .avatar{
+      width:34px;height:34px;
+      border-radius:10px;
+      background: rgba(255,255,255,.22);
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
+      font-weight:900;
+      flex: 0 0 auto;
     }
-    .header p{opacity:.92;font-size:.92rem}
+    .tgmeta{
+      min-width:0;
+    }
+    .tgname{
+      font-weight:900;
+      font-size:.95rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 260px;
+    }
+    .tgsub{
+      font-size:.82rem;
+      opacity:.92;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 260px;
+    }
+    .tag{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.8rem;
+      font-weight:900;
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.28);
+      white-space:nowrap;
+      flex: 0 0 auto;
+    }
+    .tag.ok{background: rgba(16,185,129,.25); border-color: rgba(16,185,129,.55)}
+    .tag.warn{background: rgba(245,158,11,.25); border-color: rgba(245,158,11,.55)}
 
     .progress-bar{
       display:flex;
       justify-content:center;
-      padding:16px 20px 0;
+      padding:14px 18px 0;
       gap:8px;
       background:var(--white);
       flex: 0 0 auto;
@@ -127,7 +193,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:800;
+      font-weight:900;
       font-size:.9rem;
       transition:var(--transition);
       position:relative;
@@ -145,25 +211,23 @@
     }
     .progress-step:last-child::after{display:none}
 
-    /* скролл внутри формы */
     .form-container{
-      padding:20px;
+      padding:18px;
       position:relative;
-
       flex: 1 1 auto;
-      min-height: 0;       /* важно для flex+scroll */
-      overflow-y:auto;     /* скролл вниз */
+      min-height: 0;       /* важно для scroll в flex */
+      overflow-y:auto;     /* скролл вниз внутри формы */
       overflow-x:hidden;
       background:var(--white);
     }
 
-    .form-step{display:none;animation:slideIn .5s ease forwards}
+    .form-step{display:none;animation:slideIn .45s ease forwards}
     .form-step.active{display:block}
-    @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-30px)}}
+    @keyframes slideIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-22px)}}
 
     .step-title{
-      font-size:1.12rem;
+      font-size:1.1rem;
       font-weight:900;
       color:var(--gray-900);
       margin-bottom:14px;
@@ -176,8 +240,8 @@
     .category-grid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
-      gap:14px;
-      margin-bottom:14px;
+      gap:12px;
+      margin-bottom:12px;
     }
     @media (max-width:480px){ .category-grid{grid-template-columns:1fr} }
 
@@ -185,7 +249,7 @@
       background:var(--light-bg);
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
-      padding:16px;
+      padding:14px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -193,10 +257,10 @@
       cursor:pointer;
       transition:var(--transition);
       position:relative;
-      min-height: 150px;
+      min-height: 146px;
     }
     .category-item:hover{
-      transform:translateY(-4px);
+      transform:translateY(-3px);
       border-color:var(--primary-light);
       box-shadow:0 8px 20px rgba(79,70,229,.1);
     }
@@ -205,7 +269,7 @@
       background:rgba(79,70,229,.06);
     }
     .category-icon{
-      width:54px;height:54px;
+      width:52px;height:52px;
       background:linear-gradient(135deg,var(--primary-light),var(--primary));
       border-radius:50%;
       display:flex;
@@ -213,11 +277,10 @@
       justify-content:center;
       margin-bottom:10px;
       color:#fff;
-      font-size:1.35rem;
+      font-size:1.25rem;
     }
     .category-name{font-weight:900;margin-bottom:6px;color:var(--gray-900)}
     .category-desc{font-size:.85rem;color:var(--gray-700);line-height:1.35}
-
     .checkbox-wrapper{position:absolute;top:10px;right:10px}
     .custom-checkbox{
       width:22px;height:22px;
@@ -228,11 +291,12 @@
       justify-content:center;
       transition:var(--transition);
       background:#fff;
+      flex: 0 0 auto;
     }
     .custom-checkbox.checked{background:var(--primary);border-color:var(--primary)}
     .custom-checkbox.checked::after{content:'✓';color:#fff;font-weight:900;font-size:14px}
 
-    .input-group{margin-bottom:14px}
+    .input-group{margin-bottom:12px}
     .input-group label{
       display:block;
       font-weight:900;
@@ -242,7 +306,7 @@
     }
     .input-group input, .input-group select, .input-group textarea{
       width:100%;
-      padding:13px 14px;
+      padding:12px 14px;
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
       font-size:1rem;
@@ -259,24 +323,24 @@
     .row3{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap:12px;
+      gap:10px;
     }
     @media (max-width:480px){ .row3{grid-template-columns:1fr} }
 
-    .services-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:10px}
+    .services-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
     .service-item{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding:14px;
+      padding:12px;
       border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
       transition:var(--transition);
       cursor:pointer;
       background:#fff;
     }
-    .service-item:hover{border-color:var(--primary-light);transform:translateX(4px)}
-    .service-info{display:flex;align-items:center;gap:12px}
+    .service-item:hover{border-color:var(--primary-light);transform:translateX(3px)}
+    .service-info{display:flex;align-items:center;gap:10px}
     .service-icon{
       width:40px;height:40px;
       background:var(--light-bg);
@@ -286,14 +350,15 @@
       justify-content:center;
       color:var(--primary);
       font-size:1.05rem;
+      flex: 0 0 auto;
     }
     .service-name{font-weight:900;color:var(--gray-900)}
 
     .map-container{
-      height:280px;
+      height:260px;
       border-radius:var(--border-radius-sm);
       overflow:hidden;
-      margin-bottom:14px;
+      margin-bottom:12px;
       border:2px solid var(--gray-200);
       position:relative;
       background:#fff;
@@ -312,7 +377,7 @@
       flex-direction:column;
       gap:6px;
     }
-    .map-point{display:flex;align-items:center;gap:8px;font-weight:800}
+    .map-point{display:flex;align-items:center;gap:8px;font-weight:900}
     .point-indicator{
       width:14px;height:14px;border-radius:50%;
       border:3px solid #fff;
@@ -320,22 +385,20 @@
     .point-1{background:var(--primary)}
     .point-2{background:var(--secondary)}
 
-    /* панели кнопок — доступны при скролле */
     .controls{
       display:flex;
       justify-content:space-between;
-      gap:12px;
-      margin-top:16px;
-      padding-top:14px;
+      gap:10px;
+      margin-top:14px;
+      padding-top:12px;
       border-top:1px solid var(--gray-200);
       background:#fff;
-      position:relative; /* не fixed */
+      position:relative;
     }
-    @media (max-width:480px){
-      .controls{flex-direction:column}
-    }
+    @media (max-width:480px){ .controls{flex-direction:column} }
+
     .btn{
-      padding:13px 16px;
+      padding:12px 14px;
       border-radius:var(--border-radius-sm);
       font-weight:900;
       font-size:1rem;
@@ -375,7 +438,7 @@
       display:none;
       align-items:center;
       justify-content:center;
-      padding:20px;
+      padding:18px;
       background: rgba(255,255,255,.86);
       backdrop-filter: blur(6px);
       z-index:50;
@@ -383,7 +446,7 @@
     .accept-overlay.show{display:flex}
     .accept-card{
       width:100%;
-      max-width: 440px;
+      max-width: 460px;
       border-radius: var(--border-radius);
       border: 1px solid var(--gray-200);
       overflow:hidden;
@@ -447,8 +510,22 @@
   <div class="container" id="app">
     <div class="header">
       <div class="header-content">
-        <h1><i class="fas fa-boxes"></i> Форма заявки на товар</h1>
-        <p>Категория → Размеры → Услуги → Склад/Карта/Контакты → SQL</p>
+        <div class="titleRow">
+          <h1><i class="fas fa-boxes"></i> Заявка</h1>
+          <div class="tag" id="tgTag">Telegram: —</div>
+        </div>
+        <p>Вход — через аккаунт Telegram (автоматически в Mini App)</p>
+
+        <div class="tgbar">
+          <div class="tgleft">
+            <div class="avatar" id="tgAvatar">TG</div>
+            <div class="tgmeta">
+              <div class="tgname" id="tgName">Откройте через Telegram</div>
+              <div class="tgsub" id="tgSub">Для отправки данных боту нужно открыть форму из @Big_Full_bot</div>
+            </div>
+          </div>
+          <div class="tag warn" id="tgMode">не в Telegram</div>
+        </div>
       </div>
     </div>
 
@@ -468,7 +545,7 @@
             <div class="tiny" id="acceptSub">ID: —</div>
           </div>
           <div class="accept-body">
-            <p>SQL (пример) для записи результата после “Отправка запроса”:</p>
+            <p>Данные отправлены в бота через Telegram WebApp. SQL (пример):</p>
             <div class="sql-box" id="sqlBox"></div>
           </div>
           <div class="accept-actions">
@@ -528,9 +605,7 @@
 
         <div class="controls">
           <div></div>
-          <button class="btn btn-next" id="next1">
-            <span>Далее</span><i class="fas fa-arrow-right"></i>
-          </button>
+          <button class="btn btn-next" id="next1"><span>Далее</span><i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
@@ -578,7 +653,7 @@
         </div>
 
         <div class="tiny" style="margin-top:10px;">
-          Чтобы перейти далее: заполните количество, длина/ширина/высота, единицу измерения и выберите доставку.
+          Для перехода: заполните количество, Д/Ш/В, единицу измерения и выберите доставку.
         </div>
       </div>
 
@@ -594,7 +669,6 @@
             </div>
             <div class="custom-checkbox"></div>
           </div>
-
           <div class="service-item" data-service="sticker">
             <div class="service-info">
               <div class="service-icon"><i class="fas fa-sticky-note"></i></div>
@@ -602,7 +676,6 @@
             </div>
             <div class="custom-checkbox"></div>
           </div>
-
           <div class="service-item" data-service="defect">
             <div class="service-info">
               <div class="service-icon"><i class="fas fa-search"></i></div>
@@ -610,7 +683,6 @@
             </div>
             <div class="custom-checkbox"></div>
           </div>
-
           <div class="service-item" data-service="marking">
             <div class="service-info">
               <div class="service-icon"><i class="fas fa-tag"></i></div>
@@ -618,7 +690,6 @@
             </div>
             <div class="custom-checkbox"></div>
           </div>
-
           <div class="service-item" data-service="assembly">
             <div class="service-info">
               <div class="service-icon"><i class="fas fa-tools"></i></div>
@@ -688,7 +759,7 @@
           <button class="btn btn-submit" id="submit"><span>Отправка запроса</span><i class="fas fa-paper-plane"></i></button>
         </div>
 
-        <div class="tiny" style="margin-top:10px;">
+        <div class="tiny" style="margin-top:10px;" id="submitHint">
           Для отправки: выберите склад, поставьте 2 точки на карте, заполните имя и номер.
         </div>
       </div>
@@ -700,13 +771,49 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-    // Telegram WebApp (если открыто внутри Telegram)
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if (tg) { tg.ready(); tg.expand(); }
+    // ======================
+    // IMPORTANT:
+    // "Вход по телеграм аккаунту" в Mini App делается автоматически.
+    // Данные пользователя доступны через Telegram.WebApp.initDataUnsafe.user
+    // ======================
 
-    // State
+    const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+
+    const ui = {
+      tgTag: document.getElementById("tgTag"),
+      tgMode: document.getElementById("tgMode"),
+      tgName: document.getElementById("tgName"),
+      tgSub: document.getElementById("tgSub"),
+      tgAvatar: document.getElementById("tgAvatar"),
+      submitHint: document.getElementById("submitHint"),
+
+      acceptOverlay: document.getElementById("acceptOverlay"),
+      acceptSub: document.getElementById("acceptSub"),
+      sqlBox: document.getElementById("sqlBox"),
+      copySqlBtn: document.getElementById("copySqlBtn"),
+      closeOverlayBtn: document.getElementById("closeOverlayBtn"),
+    };
+
+    function inTelegram() {
+      return !!tg;
+    }
+
+    function getTgUser() {
+      if (!tg) return null;
+      // user доступен только если WebApp открыт из бота
+      const unsafe = tg.initDataUnsafe || {};
+      return unsafe.user || null;
+    }
+
+    // ====== State ======
     const state = {
       currentStep: 1,
+
+      // Telegram identity
+      tg_user: null,
+      tg_chat_type: null, // optional
+      tg_init_data_present: false,
+
       selectedCategory: null,
       categoryOther: "",
 
@@ -727,7 +834,88 @@
       contact: { name: "", phone: "", comment: "" },
     };
 
-    // Leaflet map
+    // ====== Telegram UI init ======
+    function initTelegramUI() {
+      if (!tg) {
+        ui.tgTag.textContent = "Telegram: OFF";
+        ui.tgMode.textContent = "не в Telegram";
+        ui.tgMode.classList.remove("ok");
+        ui.tgMode.classList.add("warn");
+        ui.tgName.textContent = "Откройте через Telegram";
+        ui.tgSub.textContent = "Для отправки данных боту откройте форму из @Big_Full_bot";
+        ui.tgAvatar.textContent = "TG";
+        return;
+      }
+
+      tg.ready();
+      tg.expand();
+
+      ui.tgTag.textContent = "Telegram: ON";
+      ui.tgMode.textContent = "в Telegram";
+      ui.tgMode.classList.remove("warn");
+      ui.tgMode.classList.add("ok");
+
+      const user = getTgUser();
+      state.tg_user = user;
+      state.tg_init_data_present = !!(tg.initData && tg.initData.length);
+
+      if (user) {
+        const full = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+        const uname = user.username ? ("@" + user.username) : "";
+        ui.tgName.textContent = full || uname || ("ID " + user.id);
+        ui.tgSub.textContent = uname ? uname : ("ID: " + user.id);
+
+        const initials = (user.first_name || "T").slice(0,1).toUpperCase() + (user.last_name ? user.last_name.slice(0,1).toUpperCase() : "");
+        ui.tgAvatar.textContent = initials || "TG";
+
+        // Предзаполним имя в форме
+        const nameInput = document.getElementById("contactName");
+        if (nameInput && !nameInput.value) nameInput.value = full || uname || "";
+
+      } else {
+        ui.tgName.textContent = "Аккаунт не доступен";
+        ui.tgSub.textContent = "Откройте WebApp через кнопку в @Big_Full_bot";
+        ui.tgAvatar.textContent = "!!";
+      }
+    }
+
+    // ====== Steps / progress ======
+    const $ = (id) => document.getElementById(id);
+
+    function setProgress(step) {
+      document.querySelectorAll(".progress-step").forEach(el => {
+        const s = Number(el.dataset.step);
+        el.classList.remove("active");
+        if (s < step) el.classList.add("completed");
+        else el.classList.remove("completed");
+        if (s === step) el.classList.add("active");
+      });
+    }
+
+    function showStep(step) {
+      const cur = $(`step${state.currentStep}`);
+      const nxt = $(`step${step}`);
+      if (!cur || !nxt) return;
+
+      cur.style.animation = "slideOut 0.45s ease forwards";
+      setTimeout(() => {
+        cur.classList.remove("active");
+        cur.style.animation = "";
+        nxt.classList.add("active");
+        nxt.style.animation = "slideIn 0.45s ease forwards";
+
+        state.currentStep = step;
+        setProgress(step);
+
+        if (step === 4) setTimeout(() => map && map.invalidateSize(), 120);
+
+        updateButtons();
+
+        document.querySelector(".form-container").scrollTop = 0;
+      }, 420);
+    }
+
+    // ====== Map (Leaflet) ======
     let map = null;
     let point1Marker = null;
     let point2Marker = null;
@@ -788,51 +976,14 @@
       if (line) { map.removeLayer(line); line = null; }
     }
 
-    // DOM helpers
-    const $ = (id) => document.getElementById(id);
-
-    function setProgress(step) {
-      document.querySelectorAll(".progress-step").forEach(el => {
-        const s = Number(el.dataset.step);
-        el.classList.remove("active");
-        if (s < step) el.classList.add("completed");
-        else el.classList.remove("completed");
-        if (s === step) el.classList.add("active");
-      });
-    }
-
-    function showStep(step) {
-      const cur = $(`step${state.currentStep}`);
-      const nxt = $(`step${step}`);
-      if (!cur || !nxt) return;
-
-      cur.style.animation = "slideOut 0.45s ease forwards";
-      setTimeout(() => {
-        cur.classList.remove("active");
-        cur.style.animation = "";
-        nxt.classList.add("active");
-        nxt.style.animation = "slideIn 0.45s ease forwards";
-
-        state.currentStep = step;
-        setProgress(step);
-
-        // Важно для Leaflet при появлении карты
-        if (step === 4) setTimeout(() => map && map.invalidateSize(), 120);
-
-        updateButtons();
-
-        // Автоскролл вверх внутри form-container, чтобы видеть заголовок шага
-        document.querySelector(".form-container").scrollTop = 0;
-      }, 420);
-    }
-
+    // ====== Validation / buttons ======
     function updateButtons() {
-      // Step 1: category required
+      // Step 1
       if (state.currentStep === 1) {
         $("next1").disabled = !state.selectedCategory;
       }
 
-      // Step 2: qty + dims + unit + delivery required
+      // Step 2
       if (state.currentStep === 2) {
         const qty = Number($("quantity").value || 0);
         const len = Number($("len").value || 0);
@@ -843,22 +994,32 @@
         $("next2").disabled = !(qty >= 1 && len > 0 && wid > 0 && hei > 0 && unit && delivery);
       }
 
-      // Step 3: always allowed
+      // Step 3
       if (state.currentStep === 3) {
         $("next3").disabled = false;
       }
 
-      // Step 4: warehouse + 2 points + name + phone
+      // Step 4 (submit)
       if (state.currentStep === 4) {
         const wh = ($("shipWarehouse").value || "").trim();
         const hasPoints = !!state.points.point1 && !!state.points.point2;
         const name = ($("contactName").value || "").trim();
         const phone = ($("contactPhone").value || "").trim();
-        $("submit").disabled = !(wh && hasPoints && name && phone);
+
+        // Важно: для отправки в бот нужен Telegram WebApp контекст и user
+        const tgOk = inTelegram() && !!getTgUser();
+
+        $("submit").disabled = !(wh && hasPoints && name && phone && tgOk);
+
+        if (!tgOk) {
+          ui.submitHint.textContent = "Откройте форму из @Big_Full_bot (как Mini App), иначе отправка в бота недоступна.";
+        } else {
+          ui.submitHint.textContent = "Для отправки: выберите склад, поставьте 2 точки на карте, заполните имя и номер.";
+        }
       }
     }
 
-    // SQL
+    // ====== SQL + payload ======
     function sqlEscape(str) {
       if (str === null || str === undefined) return "";
       return String(str).replace(/\\/g, "\\\\").replace(/'/g, "''");
@@ -866,7 +1027,16 @@
     function toJson(value) { return JSON.stringify(value ?? null); }
 
     function buildPayload() {
+      const user = getTgUser();
       return {
+        tg_user: user ? {
+          id: user.id,
+          username: user.username || null,
+          first_name: user.first_name || null,
+          last_name: user.last_name || null,
+          language_code: user.language_code || null
+        } : null,
+
         category: state.selectedCategory,
         category_other: state.categoryOther,
 
@@ -896,62 +1066,91 @@
     function buildSqlInsert(orderId, payload) {
       const p = payload;
       const cols = [
-        "order_id","category","category_other",
-        "quantity","len","wid","hei","unit",
-        "delivery","delivery_other",
-        "services_json","services_other",
-        "ship_warehouse","ship_warehouse_other",
-        "point1_json","point2_json",
-        "contact_name","contact_phone","comment",
+        "order_id",
+        "tg_user_id",
+        "tg_username",
+        "tg_first_name",
+        "tg_last_name",
+
+        "category",
+        "category_other",
+
+        "quantity",
+        "len","wid","hei","unit",
+
+        "delivery",
+        "delivery_other",
+
+        "services_json",
+        "services_other",
+
+        "ship_warehouse",
+        "ship_warehouse_other",
+
+        "point1_json",
+        "point2_json",
+
+        "contact_name",
+        "contact_phone",
+        "comment",
         "created_at"
       ];
+
+      const u = p.tg_user || {};
       const values = [
         `'${sqlEscape(orderId)}'`,
+        u.id ? Number(u.id) : "NULL",
+        `'${sqlEscape(u.username || "")}'`,
+        `'${sqlEscape(u.first_name || "")}'`,
+        `'${sqlEscape(u.last_name || "")}'`,
+
         `'${sqlEscape(p.category)}'`,
         `'${sqlEscape(p.category_other)}'`,
+
         Number(p.quantity || 0),
         Number(p.dimensions?.len || 0),
         Number(p.dimensions?.wid || 0),
         Number(p.dimensions?.hei || 0),
         `'${sqlEscape(p.dimensions?.unit || "")}'`,
+
         `'${sqlEscape(p.delivery)}'`,
         `'${sqlEscape(p.delivery_other)}'`,
+
         `'${sqlEscape(toJson(p.services))}'`,
         `'${sqlEscape(p.services_other)}'`,
+
         `'${sqlEscape(p.ship_warehouse)}'`,
         `'${sqlEscape(p.ship_warehouse_other)}'`,
+
         `'${sqlEscape(toJson(p.point1))}'`,
         `'${sqlEscape(toJson(p.point2))}'`,
+
         `'${sqlEscape(p.contact_name)}'`,
         `'${sqlEscape(p.contact_phone)}'`,
         `'${sqlEscape(p.comment)}'`,
         `'${sqlEscape(p.ts)}'`
       ];
+
       return `INSERT INTO orders (${cols.join(", ")})\nVALUES (${values.join(", ")});`;
     }
 
-    // Overlay
-    const overlay = $("acceptOverlay");
-    const sqlBox = $("sqlBox");
-    const acceptSub = $("acceptSub");
-
-    function showAccepted(orderId, sql) {
-      acceptSub.textContent = `ID: ${orderId}`;
-      sqlBox.textContent = sql;
-      overlay.classList.add("show");
-    }
-
-    $("closeOverlayBtn").addEventListener("click", () => overlay.classList.remove("show"));
-
-    $("copySqlBtn").addEventListener("click", async () => {
+    // ====== Overlay actions ======
+    ui.closeOverlayBtn.addEventListener("click", () => ui.acceptOverlay.classList.remove("show"));
+    ui.copySqlBtn.addEventListener("click", async () => {
       try{
-        await navigator.clipboard.writeText(sqlBox.textContent);
-        $("copySqlBtn").textContent = "Скопировано";
-        setTimeout(()=> $("copySqlBtn").textContent = "Копировать SQL", 900);
+        await navigator.clipboard.writeText(ui.sqlBox.textContent);
+        ui.copySqlBtn.textContent = "Скопировано";
+        setTimeout(()=> ui.copySqlBtn.textContent = "Копировать SQL", 900);
       }catch{}
     });
 
-    // Listeners
+    function showAccepted(orderId, sql) {
+      ui.acceptSub.textContent = `ID: ${orderId}`;
+      ui.sqlBox.textContent = sql;
+      ui.acceptOverlay.classList.add("show");
+    }
+
+    // ====== Event listeners ======
     function setupEventListeners() {
       // Step1 categories (single)
       document.querySelectorAll(".category-item").forEach(item => {
@@ -970,7 +1169,7 @@
 
       $("categoryOther").addEventListener("input", (e) => state.categoryOther = e.target.value);
 
-      // Step2
+      // Step2 inputs
       $("quantity").addEventListener("input", (e) => {
         const v = Math.max(1, parseInt(e.target.value || "1", 10));
         e.target.value = v;
@@ -982,7 +1181,7 @@
         $(id).addEventListener("change", updateButtons);
       });
 
-      // Step3 services
+      // Step3 services toggle
       document.querySelectorAll(".service-item").forEach(item => {
         item.addEventListener("click", () => {
           const key = item.dataset.service;
@@ -997,14 +1196,14 @@
       });
       $("servicesOther").addEventListener("input", (e)=> state.servicesOther = e.target.value);
 
-      // Step4
+      // Step4 inputs
       $("shipWarehouse").addEventListener("change", updateButtons);
       $("shipWarehouseOther").addEventListener("input", (e)=> state.shipWarehouseOther = e.target.value);
       $("contactName").addEventListener("input", updateButtons);
       $("contactPhone").addEventListener("input", updateButtons);
       $("commentFinal").addEventListener("input", () => {});
 
-      // Nav
+      // Navigation
       $("next1").addEventListener("click", () => showStep(2));
       $("prev2").addEventListener("click", () => showStep(1));
       $("next2").addEventListener("click", () => showStep(3));
@@ -1012,9 +1211,15 @@
       $("next3").addEventListener("click", () => showStep(4));
       $("prev4").addEventListener("click", () => showStep(3));
 
-      // Submit
+      // Submit: send to bot (via WebApp sendData)
       $("submit").addEventListener("click", () => {
-        // collect step2
+        // Enforce Telegram account presence
+        const user = getTgUser();
+        if (!tg || !user) {
+          alert("Откройте форму из @Big_Full_bot внутри Telegram (Mini App), чтобы отправить данные боту.");
+          return;
+        }
+
         state.dims.len = Number($("len").value || 0);
         state.dims.wid = Number($("wid").value || 0);
         state.dims.hei = Number($("hei").value || 0);
@@ -1036,19 +1241,22 @@
         const orderId = `ORD-${Math.floor(100000 + Math.random()*900000)}`;
         const sql = buildSqlInsert(orderId, payload);
 
+        // 1) показать "принято"
         showAccepted(orderId, sql);
 
-        // send to Telegram WebApp
-       if (tg) {
-  tg.sendData(JSON.stringify({ order_id: orderId, payload, sql }));
-} else {
-  console.log("Откройте через Telegram Mini App, чтобы отправить в бота.");
-}
-
+        // 2) отправить данные в бот (бот получит web_app_data)
+        tg.sendData(JSON.stringify({
+          bot_username: "@Big_Full_bot",
+          order_id: orderId,
+          payload: payload,
+          sql: sql
+        }));
       });
     }
 
+    // ====== Init ======
     document.addEventListener("DOMContentLoaded", () => {
+      initTelegramUI();
       initMap();
       setupEventListeners();
       updateButtons();
@@ -1056,6 +1264,7 @@
   </script>
 </body>
 </html>
+
 
 
 
