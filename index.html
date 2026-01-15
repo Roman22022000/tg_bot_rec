@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Форма заявки | Telegram Mini App</title>
+  <title>Заявка | Telegram Mini App</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,10 +36,10 @@
       min-height:100vh;
       display:flex;
       justify-content:center;
-      align-items:flex-start;     /* важно для скролла */
+      align-items:flex-start;
       padding:16px;
       color:var(--gray-900);
-      overflow-y:auto;            /* вертикальный скролл */
+      overflow-y:auto;
       overflow-x:hidden;
     }
 
@@ -63,7 +63,7 @@
 
     .container{
       width:100%;
-      max-width:540px;
+      max-width:560px;
       background:var(--white);
       border-radius:var(--border-radius);
       box-shadow:var(--box-shadow);
@@ -104,20 +104,15 @@
       gap:12px;
     }
     .header h1{
-      font-size:1.25rem;
+      font-size:1.22rem;
       font-weight:900;
       display:flex;
       align-items:center;
       gap:10px;
       margin:0;
     }
-    .header p{
-      margin:6px 0 0;
-      opacity:.92;
-      font-size:.9rem;
-    }
+    .header p{margin:6px 0 0;opacity:.92;font-size:.9rem}
 
-    /* Telegram account bar */
     .tgbar{
       margin-top:10px;
       background: rgba(255,255,255,.14);
@@ -129,12 +124,7 @@
       justify-content:space-between;
       gap:10px;
     }
-    .tgleft{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
+    .tgleft{display:flex;align-items:center;gap:10px;min-width:0}
     .avatar{
       width:34px;height:34px;
       border-radius:10px;
@@ -145,34 +135,23 @@
       font-weight:900;
       flex: 0 0 auto;
     }
-    .tgmeta{
-      min-width:0;
-    }
+    .tgmeta{min-width:0}
     .tgname{
-      font-weight:900;
-      font-size:.95rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 260px;
+      font-weight:900;font-size:.95rem;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width: 300px;
     }
     .tgsub{
-      font-size:.82rem;
-      opacity:.92;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 260px;
+      font-size:.82rem;opacity:.92;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width: 300px;
     }
     .tag{
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:.8rem;
-      font-weight:900;
+      padding:6px 10px;border-radius:999px;
+      font-size:.8rem;font-weight:900;
       background: rgba(255,255,255,.2);
       border: 1px solid rgba(255,255,255,.28);
-      white-space:nowrap;
-      flex: 0 0 auto;
+      white-space:nowrap;flex: 0 0 auto;
     }
     .tag.ok{background: rgba(16,185,129,.25); border-color: rgba(16,185,129,.55)}
     .tag.warn{background: rgba(245,158,11,.25); border-color: rgba(245,158,11,.55)}
@@ -186,27 +165,20 @@
       flex: 0 0 auto;
     }
     .progress-step{
-      width:32px;height:32px;
-      border-radius:50%;
+      width:32px;height:32px;border-radius:50%;
       background:var(--gray-200);
       color:var(--gray-700);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      font-size:.9rem;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;font-size:.9rem;
       transition:var(--transition);
-      position:relative;
-      user-select:none;
+      position:relative;user-select:none;
     }
     .progress-step.active{background:var(--primary);color:var(--white);transform:scale(1.1)}
     .progress-step.completed{background:var(--secondary);color:var(--white)}
     .progress-step::after{
       content:'';
-      position:absolute;
-      top:50%;left:100%;
-      width:16px;height:2px;
-      background:var(--gray-200);
+      position:absolute;top:50%;left:100%;
+      width:16px;height:2px;background:var(--gray-200);
       transform:translateY(-50%);
     }
     .progress-step:last-child::after{display:none}
@@ -215,8 +187,8 @@
       padding:18px;
       position:relative;
       flex: 1 1 auto;
-      min-height: 0;       /* важно для scroll в flex */
-      overflow-y:auto;     /* скролл вниз внутри формы */
+      min-height: 0;
+      overflow-y:auto;
       overflow-x:hidden;
       background:var(--white);
     }
@@ -227,13 +199,8 @@
     @keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-22px)}}
 
     .step-title{
-      font-size:1.1rem;
-      font-weight:900;
-      color:var(--gray-900);
-      margin-bottom:14px;
-      display:flex;
-      align-items:center;
-      gap:10px;
+      font-size:1.08rem;font-weight:900;color:var(--gray-900);
+      margin-bottom:14px;display:flex;align-items:center;gap:10px;
     }
     .step-title i{color:var(--primary)}
 
@@ -272,190 +239,138 @@
       width:52px;height:52px;
       background:linear-gradient(135deg,var(--primary-light),var(--primary));
       border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin-bottom:10px;
-      color:#fff;
-      font-size:1.25rem;
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:10px;color:#fff;font-size:1.25rem;
     }
     .category-name{font-weight:900;margin-bottom:6px;color:var(--gray-900)}
     .category-desc{font-size:.85rem;color:var(--gray-700);line-height:1.35}
     .checkbox-wrapper{position:absolute;top:10px;right:10px}
     .custom-checkbox{
-      width:22px;height:22px;
-      border:2px solid var(--gray-300);
-      border-radius:6px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:var(--transition);
-      background:#fff;
-      flex: 0 0 auto;
+      width:22px;height:22px;border:2px solid var(--gray-300);
+      border-radius:6px;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition);background:#fff;flex: 0 0 auto;
     }
     .custom-checkbox.checked{background:var(--primary);border-color:var(--primary)}
     .custom-checkbox.checked::after{content:'✓';color:#fff;font-weight:900;font-size:14px}
 
     .input-group{margin-bottom:12px}
     .input-group label{
-      display:block;
-      font-weight:900;
-      margin-bottom:8px;
-      color:var(--gray-900);
-      font-size:.95rem;
+      display:block;font-weight:900;margin-bottom:8px;
+      color:var(--gray-900);font-size:.95rem;
     }
     .input-group input, .input-group select, .input-group textarea{
-      width:100%;
-      padding:12px 14px;
-      border:2px solid var(--gray-200);
-      border-radius:var(--border-radius-sm);
-      font-size:1rem;
-      transition:var(--transition);
-      background:#fff;
+      width:100%;padding:12px 14px;border:2px solid var(--gray-200);
+      border-radius:var(--border-radius-sm);font-size:1rem;
+      transition:var(--transition);background:#fff;
     }
     .input-group textarea{min-height:86px;resize:vertical}
     .input-group input:focus, .input-group select:focus, .input-group textarea:focus{
-      outline:none;
-      border-color:var(--primary);
-      box-shadow:0 0 0 3px rgba(79,70,229,.1);
+      outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1);
     }
 
-    .row3{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap:10px;
-    }
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
     @media (max-width:480px){ .row3{grid-template-columns:1fr} }
 
     .services-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
     .service-item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px;
-      border:2px solid var(--gray-200);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px;border:2px solid var(--gray-200);
       border-radius:var(--border-radius-sm);
-      transition:var(--transition);
-      cursor:pointer;
-      background:#fff;
+      transition:var(--transition);cursor:pointer;background:#fff;
     }
     .service-item:hover{border-color:var(--primary-light);transform:translateX(3px)}
     .service-info{display:flex;align-items:center;gap:10px}
     .service-icon{
-      width:40px;height:40px;
-      background:var(--light-bg);
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--primary);
-      font-size:1.05rem;
-      flex: 0 0 auto;
+      width:40px;height:40px;background:var(--light-bg);
+      border-radius:8px;display:flex;align-items:center;justify-content:center;
+      color:var(--primary);font-size:1.05rem;flex: 0 0 auto;
     }
     .service-name{font-weight:900;color:var(--gray-900)}
 
     .map-container{
-      height:260px;
-      border-radius:var(--border-radius-sm);
-      overflow:hidden;
-      margin-bottom:12px;
-      border:2px solid var(--gray-200);
-      position:relative;
-      background:#fff;
+      height:260px;border-radius:var(--border-radius-sm);
+      overflow:hidden;margin-bottom:12px;border:2px solid var(--gray-200);
+      position:relative;background:#fff;
     }
     #map{height:100%;width:100%}
     .map-instructions{
-      position:absolute;
-      top:10px;left:10px;right:10px;
+      position:absolute;top:10px;left:10px;right:10px;
       background:rgba(255,255,255,.95);
-      padding:10px 12px;
-      border-radius:var(--border-radius-sm);
-      font-size:.88rem;
-      z-index:1000;
-      box-shadow:0 4px 12px rgba(0,0,0,.1);
-      display:flex;
-      flex-direction:column;
-      gap:6px;
+      padding:10px 12px;border-radius:var(--border-radius-sm);
+      font-size:.88rem;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.1);
+      display:flex;flex-direction:column;gap:6px;
     }
     .map-point{display:flex;align-items:center;gap:8px;font-weight:900}
-    .point-indicator{
-      width:14px;height:14px;border-radius:50%;
-      border:3px solid #fff;
-    }
+    .point-indicator{width:14px;height:14px;border-radius:50%;border:3px solid #fff}
     .point-1{background:var(--primary)}
     .point-2{background:var(--secondary)}
 
     .controls{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid var(--gray-200);
-      background:#fff;
-      position:relative;
+      display:flex;justify-content:space-between;gap:10px;
+      margin-top:14px;padding-top:12px;border-top:1px solid var(--gray-200);
+      background:#fff;position:relative;
     }
     @media (max-width:480px){ .controls{flex-direction:column} }
 
     .btn{
-      padding:12px 14px;
-      border-radius:var(--border-radius-sm);
-      font-weight:900;
-      font-size:1rem;
-      cursor:pointer;
-      transition:var(--transition);
-      border:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-width: 150px;
-      user-select:none;
-      white-space:nowrap;
+      padding:12px 14px;border-radius:var(--border-radius-sm);
+      font-weight:900;font-size:1rem;cursor:pointer;transition:var(--transition);
+      border:none;display:flex;align-items:center;justify-content:center;gap:8px;
+      min-width:150px;user-select:none;white-space:nowrap;
     }
     .btn-prev{
-      background:var(--gray-100);
-      color:var(--gray-700);
-      border:2px solid var(--gray-200);
+      background:var(--gray-100);color:var(--gray-700);border:2px solid var(--gray-200);
     }
     .btn-prev:hover{background:var(--gray-200);transform:translateX(-2px)}
     .btn-next, .btn-submit{
       background:linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
       color:#fff;
     }
-    .btn-next:hover, .btn-submit:hover{
-      transform:translateY(-2px);
-      box-shadow:0 8px 20px rgba(79,70,229,.3);
-    }
+    .btn-next:hover, .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,.3)}
     .btn:disabled{opacity:.6;cursor:not-allowed;transform:none !important;box-shadow:none !important}
 
     .tiny{font-size:.85rem;color:var(--gray-700);line-height:1.4}
 
+    /* итог */
+    .summaryCard{
+      border:2px solid var(--gray-200);
+      border-radius:var(--border-radius-sm);
+      padding:12px;
+      background:var(--light-bg);
+    }
+    .summaryRow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 0;
+      border-bottom:1px solid var(--gray-200);
+    }
+    .summaryRow:last-child{border-bottom:none}
+    .summaryKey{font-weight:900;color:var(--gray-900)}
+    .summaryVal{color:var(--gray-700);text-align:right;max-width:60%;word-break:break-word}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+    .chip{
+      padding:6px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--gray-300);
+      font-weight:900;
+      font-size:.85rem;
+      color:var(--gray-900);
+    }
+
     /* overlay “запрос принят” */
     .accept-overlay{
-      position:absolute;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background: rgba(255,255,255,.86);
-      backdrop-filter: blur(6px);
-      z-index:50;
+      position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+      padding:18px;background: rgba(255,255,255,.86);backdrop-filter: blur(6px);z-index:50;
     }
     .accept-overlay.show{display:flex}
     .accept-card{
-      width:100%;
-      max-width: 460px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--gray-200);
-      overflow:hidden;
-      box-shadow: var(--box-shadow);
-      background:#fff;
+      width:100%;max-width: 460px;border-radius: var(--border-radius);
+      border: 1px solid var(--gray-200);overflow:hidden;box-shadow: var(--box-shadow);background:#fff;
     }
     .accept-top{
-      padding:18px 16px;
-      color:#fff;
+      padding:18px 16px;color:#fff;
       background: linear-gradient(120deg, #4f46e5, #06b6d4, #10b981, #818cf8);
       background-size: 300% 300%;
       animation: gradMove 3.2s ease-in-out infinite;
@@ -465,43 +380,38 @@
       50%{background-position:100% 50%}
       100%{background-position:0% 50%}
     }
-    .accept-top h3{
-      display:flex;align-items:center;gap:10px;
-      font-size:1.12rem;font-weight:900;margin:0;
-    }
+    .accept-top h3{display:flex;align-items:center;gap:10px;font-size:1.12rem;font-weight:900;margin:0}
     .accept-top .tiny{color:rgba(255,255,255,.92);margin-top:6px}
     .accept-body{padding:16px}
     .accept-body p{color:var(--gray-700);line-height:1.5;margin:0 0 12px}
     .sql-box{
-      border:2px solid var(--gray-200);
-      border-radius: var(--border-radius-sm);
-      padding:12px;
-      background:#fff;
+      border:2px solid var(--gray-200);border-radius: var(--border-radius-sm);
+      padding:12px;background:#fff;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:12px;
-      color:var(--gray-900);
-      white-space:pre-wrap;
-      word-break:break-word;
-      max-height: 220px;
-      overflow:auto;
+      font-size:12px;color:var(--gray-900);
+      white-space:pre-wrap;word-break:break-word;
+      max-height: 220px;overflow:auto;
     }
-    .accept-actions{
-      display:flex; gap:10px; padding: 0 16px 16px;
-    }
+    .accept-actions{display:flex; gap:10px; padding: 0 16px 16px}
     .mini-btn{
-      flex:1;
-      padding:12px 12px;
-      border-radius: var(--border-radius-sm);
-      font-weight:900;
-      border:2px solid var(--gray-200);
-      background:#fff;
-      cursor:pointer;
-      transition: var(--transition);
+      flex:1;padding:12px 12px;border-radius: var(--border-radius-sm);
+      font-weight:900;border:2px solid var(--gray-200);
+      background:#fff;cursor:pointer;transition: var(--transition);
     }
     .mini-btn:hover{transform:translateY(-1px)}
     .mini-btn.primary{
-      border:none;color:#fff;
-      background: linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
+      border:none;color:#fff;background: linear-gradient(90deg,var(--primary) 0%, var(--primary-light) 100%);
+    }
+
+    .warnBox{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(245,158,11,.55);
+      background: rgba(245,158,11,.12);
+      color: var(--gray-900);
+      font-weight:800;
+      display:none;
     }
   </style>
 </head>
@@ -514,14 +424,14 @@
           <h1><i class="fas fa-boxes"></i> Заявка</h1>
           <div class="tag" id="tgTag">Telegram: —</div>
         </div>
-        <p>Вход — через аккаунт Telegram (автоматически в Mini App)</p>
+        <p>Итог перед отправкой → Отправка в бота → “Запрос принят”</p>
 
         <div class="tgbar">
           <div class="tgleft">
             <div class="avatar" id="tgAvatar">TG</div>
             <div class="tgmeta">
               <div class="tgname" id="tgName">Откройте через Telegram</div>
-              <div class="tgsub" id="tgSub">Для отправки данных боту нужно открыть форму из @Big_Full_bot</div>
+              <div class="tgsub" id="tgSub">Открывайте форму из бота, чтобы отправка работала</div>
             </div>
           </div>
           <div class="tag warn" id="tgMode">не в Telegram</div>
@@ -534,6 +444,7 @@
       <div class="progress-step" data-step="2">2</div>
       <div class="progress-step" data-step="3">3</div>
       <div class="progress-step" data-step="4">4</div>
+      <div class="progress-step" data-step="5">5</div>
     </div>
 
     <div class="form-container">
@@ -647,13 +558,11 @@
           <input id="deliveryOther" type="text" placeholder="Адрес, контакты, время, комментарии..." />
         </div>
 
+        <div class="warnBox" id="warn2">Заполните: количество, длина/ширина/высота, единица, доставка.</div>
+
         <div class="controls">
           <button class="btn btn-prev" id="prev2"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
           <button class="btn btn-next" id="next2"><span>Далее</span><i class="fas fa-arrow-right"></i></button>
-        </div>
-
-        <div class="tiny" style="margin-top:10px;">
-          Для перехода: заполните количество, Д/Ш/В, единицу измерения и выберите доставку.
         </div>
       </div>
 
@@ -754,13 +663,37 @@
           <textarea id="commentFinal" placeholder="Любые уточнения по заявке"></textarea>
         </div>
 
+        <div class="warnBox" id="warn4">Заполните склад, отметьте 2 точки на карте, имя и номер.</div>
+
         <div class="controls">
           <button class="btn btn-prev" id="prev4"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
-          <button class="btn btn-submit" id="submit"><span>Отправка запроса</span><i class="fas fa-paper-plane"></i></button>
+          <button class="btn btn-next" id="next4"><span>Итог</span><i class="fas fa-arrow-right"></i></button>
         </div>
 
         <div class="tiny" style="margin-top:10px;" id="submitHint">
-          Для отправки: выберите склад, поставьте 2 точки на карте, заполните имя и номер.
+          На следующем шаге вы увидите итог и сможете перепроверить.
+        </div>
+      </div>
+
+      <!-- STEP 5: SUMMARY -->
+      <div class="form-step" id="step5">
+        <h2 class="step-title"><i class="fas fa-clipboard-check"></i> Итог (перепроверьте)</h2>
+
+        <div class="summaryCard" id="summaryCard">
+          <!-- заполняется JS -->
+        </div>
+
+        <div class="warnBox" id="warnSend">
+          Отправка невозможна: откройте приложение через кнопку WebApp в вашем боте.
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-prev" id="prev5"><i class="fas fa-arrow-left"></i><span>Назад</span></button>
+          <button class="btn btn-submit" id="submit"><span>Отправка запроса</span><i class="fas fa-paper-plane"></i></button>
+        </div>
+
+        <div class="tiny" style="margin-top:10px;">
+          После отправки бот получит JSON (web_app_data) и сможет ответить “Запрос принят”.
         </div>
       </div>
 
@@ -771,12 +704,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <script>
-    // ======================
-    // IMPORTANT:
-    // "Вход по телеграм аккаунту" в Mini App делается автоматически.
-    // Данные пользователя доступны через Telegram.WebApp.initDataUnsafe.user
-    // ======================
-
+    // ===== Telegram =====
     const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 
     const ui = {
@@ -785,35 +713,67 @@
       tgName: document.getElementById("tgName"),
       tgSub: document.getElementById("tgSub"),
       tgAvatar: document.getElementById("tgAvatar"),
-      submitHint: document.getElementById("submitHint"),
 
       acceptOverlay: document.getElementById("acceptOverlay"),
       acceptSub: document.getElementById("acceptSub"),
       sqlBox: document.getElementById("sqlBox"),
       copySqlBtn: document.getElementById("copySqlBtn"),
       closeOverlayBtn: document.getElementById("closeOverlayBtn"),
+
+      warn2: document.getElementById("warn2"),
+      warn4: document.getElementById("warn4"),
+      warnSend: document.getElementById("warnSend"),
+      summaryCard: document.getElementById("summaryCard"),
     };
 
-    function inTelegram() {
-      return !!tg;
-    }
-
-    function getTgUser() {
+    function inTelegram(){ return !!tg; }
+    function getTgUser(){
       if (!tg) return null;
-      // user доступен только если WebApp открыт из бота
       const unsafe = tg.initDataUnsafe || {};
       return unsafe.user || null;
     }
 
-    // ====== State ======
+    function initTelegramUI() {
+      if (!tg) {
+        ui.tgTag.textContent = "Telegram: OFF";
+        ui.tgMode.textContent = "не в Telegram";
+        ui.tgMode.classList.remove("ok");
+        ui.tgMode.classList.add("warn");
+        ui.tgName.textContent = "Откройте через Telegram";
+        ui.tgSub.textContent = "Для отправки в бота откройте форму из бота (WebApp кнопка)";
+        ui.tgAvatar.textContent = "TG";
+        return;
+      }
+      tg.ready();
+      tg.expand();
+
+      ui.tgTag.textContent = "Telegram: ON";
+      ui.tgMode.textContent = "в Telegram";
+      ui.tgMode.classList.remove("warn");
+      ui.tgMode.classList.add("ok");
+
+      const user = getTgUser();
+      if (user) {
+        const full = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+        const uname = user.username ? ("@" + user.username) : "";
+        ui.tgName.textContent = full || uname || ("ID " + user.id);
+        ui.tgSub.textContent = uname ? uname : ("ID: " + user.id);
+        const initials = (user.first_name || "T").slice(0,1).toUpperCase() + (user.last_name ? user.last_name.slice(0,1).toUpperCase() : "");
+        ui.tgAvatar.textContent = initials || "TG";
+
+        // предзаполним имя
+        const nameInput = document.getElementById("contactName");
+        if (nameInput && !nameInput.value) nameInput.value = full || uname || "";
+      } else {
+        ui.tgName.textContent = "Аккаунт не доступен";
+        ui.tgSub.textContent = "Откройте WebApp через кнопку в боте";
+        ui.tgAvatar.textContent = "!!";
+      }
+    }
+
+    // ===== State =====
     const state = {
       currentStep: 1,
-
-      // Telegram identity
-      tg_user: null,
-      tg_chat_type: null, // optional
-      tg_init_data_present: false,
-
       selectedCategory: null,
       categoryOther: "",
 
@@ -834,52 +794,7 @@
       contact: { name: "", phone: "", comment: "" },
     };
 
-    // ====== Telegram UI init ======
-    function initTelegramUI() {
-      if (!tg) {
-        ui.tgTag.textContent = "Telegram: OFF";
-        ui.tgMode.textContent = "не в Telegram";
-        ui.tgMode.classList.remove("ok");
-        ui.tgMode.classList.add("warn");
-        ui.tgName.textContent = "Откройте через Telegram";
-        ui.tgSub.textContent = "Для отправки данных боту откройте форму из @Big_Full_bot";
-        ui.tgAvatar.textContent = "TG";
-        return;
-      }
-
-      tg.ready();
-      tg.expand();
-
-      ui.tgTag.textContent = "Telegram: ON";
-      ui.tgMode.textContent = "в Telegram";
-      ui.tgMode.classList.remove("warn");
-      ui.tgMode.classList.add("ok");
-
-      const user = getTgUser();
-      state.tg_user = user;
-      state.tg_init_data_present = !!(tg.initData && tg.initData.length);
-
-      if (user) {
-        const full = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
-        const uname = user.username ? ("@" + user.username) : "";
-        ui.tgName.textContent = full || uname || ("ID " + user.id);
-        ui.tgSub.textContent = uname ? uname : ("ID: " + user.id);
-
-        const initials = (user.first_name || "T").slice(0,1).toUpperCase() + (user.last_name ? user.last_name.slice(0,1).toUpperCase() : "");
-        ui.tgAvatar.textContent = initials || "TG";
-
-        // Предзаполним имя в форме
-        const nameInput = document.getElementById("contactName");
-        if (nameInput && !nameInput.value) nameInput.value = full || uname || "";
-
-      } else {
-        ui.tgName.textContent = "Аккаунт не доступен";
-        ui.tgSub.textContent = "Откройте WebApp через кнопку в @Big_Full_bot";
-        ui.tgAvatar.textContent = "!!";
-      }
-    }
-
-    // ====== Steps / progress ======
+    // ===== Steps / progress =====
     const $ = (id) => document.getElementById(id);
 
     function setProgress(step) {
@@ -908,14 +823,13 @@
         setProgress(step);
 
         if (step === 4) setTimeout(() => map && map.invalidateSize(), 120);
-
-        updateButtons();
+        if (step === 5) renderSummary();
 
         document.querySelector(".form-container").scrollTop = 0;
       }, 420);
     }
 
-    // ====== Map (Leaflet) ======
+    // ===== Map =====
     let map = null;
     let point1Marker = null;
     let point2Marker = null;
@@ -939,7 +853,6 @@
               html: '<div style="background:#4f46e5;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>'
             })
           }).addTo(map).bindPopup("Точка 1: место товара").openPopup();
-          updateButtons();
           return;
         }
 
@@ -959,12 +872,10 @@
             { color:"#4f46e5", weight:3, opacity:.7, dashArray:"10,10" }
           ).addTo(map);
 
-          updateButtons();
           return;
         }
 
-        resetMapPoints(); // 3-й клик — сброс
-        updateButtons();
+        resetMapPoints();
       });
     }
 
@@ -976,50 +887,144 @@
       if (line) { map.removeLayer(line); line = null; }
     }
 
-    // ====== Validation / buttons ======
-    function updateButtons() {
-      // Step 1
-      if (state.currentStep === 1) {
-        $("next1").disabled = !state.selectedCategory;
-      }
+    // ===== Validation =====
+    function validateStep2(showWarn=false){
+      const qty = Number($("quantity").value || 0);
+      const len = Number($("len").value || 0);
+      const wid = Number($("wid").value || 0);
+      const hei = Number($("hei").value || 0);
+      const unit = ($("unit").value || "").trim();
+      const delivery = ($("delivery").value || "").trim();
 
-      // Step 2
-      if (state.currentStep === 2) {
-        const qty = Number($("quantity").value || 0);
-        const len = Number($("len").value || 0);
-        const wid = Number($("wid").value || 0);
-        const hei = Number($("hei").value || 0);
-        const unit = ($("unit").value || "").trim();
-        const delivery = ($("delivery").value || "").trim();
-        $("next2").disabled = !(qty >= 1 && len > 0 && wid > 0 && hei > 0 && unit && delivery);
-      }
-
-      // Step 3
-      if (state.currentStep === 3) {
-        $("next3").disabled = false;
-      }
-
-      // Step 4 (submit)
-      if (state.currentStep === 4) {
-        const wh = ($("shipWarehouse").value || "").trim();
-        const hasPoints = !!state.points.point1 && !!state.points.point2;
-        const name = ($("contactName").value || "").trim();
-        const phone = ($("contactPhone").value || "").trim();
-
-        // Важно: для отправки в бот нужен Telegram WebApp контекст и user
-        const tgOk = inTelegram() && !!getTgUser();
-
-        $("submit").disabled = !(wh && hasPoints && name && phone && tgOk);
-
-        if (!tgOk) {
-          ui.submitHint.textContent = "Откройте форму из @Big_Full_bot (как Mini App), иначе отправка в бота недоступна.";
-        } else {
-          ui.submitHint.textContent = "Для отправки: выберите склад, поставьте 2 точки на карте, заполните имя и номер.";
-        }
-      }
+      const ok = (qty >= 1 && len > 0 && wid > 0 && hei > 0 && unit && delivery);
+      ui.warn2.style.display = (!ok && showWarn) ? "block" : "none";
+      return ok;
     }
 
-    // ====== SQL + payload ======
+    function validateStep4(showWarn=false){
+      const wh = ($("shipWarehouse").value || "").trim();
+      const hasPoints = !!state.points.point1 && !!state.points.point2;
+      const name = ($("contactName").value || "").trim();
+      const phone = ($("contactPhone").value || "").trim();
+
+      const ok = (wh && hasPoints && name && phone);
+      ui.warn4.style.display = (!ok && showWarn) ? "block" : "none";
+      return ok;
+    }
+
+    // ===== Summary =====
+    function safeStr(x){ return (x === null || x === undefined || x === "") ? "—" : String(x); }
+
+    function renderSummary(){
+      // собрать значения из полей
+      collectAll();
+
+      const servicesHuman = state.services.length ? state.services.map(mapServiceName).join(", ") : "—";
+      const p1 = state.points.point1 ? `${state.points.point1.lat.toFixed(5)}, ${state.points.point1.lng.toFixed(5)}` : "—";
+      const p2 = state.points.point2 ? `${state.points.point2.lat.toFixed(5)}, ${state.points.point2.lng.toFixed(5)}` : "—";
+
+      ui.summaryCard.innerHTML = `
+        ${row("Категория", safeStr(state.selectedCategory))}
+        ${row("Категория (другое)", safeStr(state.categoryOther))}
+        ${row("Количество", safeStr(state.quantity))}
+        ${row("Размеры (Д×Ш×В)", `${safeStr(state.dims.len)} × ${safeStr(state.dims.wid)} × ${safeStr(state.dims.hei)} ${safeStr(state.dims.unit)}`)}
+        ${row("Доставка", mapDeliveryName(state.delivery))}
+        ${row("Доставка (другое)", safeStr(state.deliveryOther))}
+        ${row("Услуги", servicesHuman, true)}
+        ${row("Услуги (другое)", safeStr(state.servicesOther))}
+        ${row("Склад", mapWarehouseName(state.shipWarehouse))}
+        ${row("Склад (другое)", safeStr(state.shipWarehouseOther))}
+        ${row("Точка 1 (товар)", p1)}
+        ${row("Точка 2 (хранение)", p2)}
+        ${row("Имя", safeStr(state.contact.name))}
+        ${row("Номер", safeStr(state.contact.phone))}
+        ${row("Комментарий", safeStr(state.contact.comment))}
+      `;
+
+      // если не в телеграм — запрет отправки
+      const canSend = inTelegram() && !!getTgUser();
+      ui.warnSend.style.display = canSend ? "none" : "block";
+      $("submit").disabled = !canSend;
+    }
+
+    function row(key, val, chips=false){
+      if (!chips) {
+        return `
+          <div class="summaryRow">
+            <div class="summaryKey">${escapeHtml(key)}</div>
+            <div class="summaryVal">${escapeHtml(val)}</div>
+          </div>
+        `;
+      }
+      // chips view
+      const list = (val && val !== "—") ? val.split(",").map(s=>s.trim()).filter(Boolean) : [];
+      const chipsHtml = list.length
+        ? `<div class="chips">${list.map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join("")}</div>`
+        : `<div class="summaryVal">—</div>`;
+      return `
+        <div class="summaryRow">
+          <div class="summaryKey">${escapeHtml(key)}</div>
+          <div class="summaryVal">${chipsHtml}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    function mapServiceName(k){
+      const m = {
+        packaging:"Упаковать",
+        sticker:"Наклейка",
+        defect:"Брак (проверка)",
+        marking:"Маркировка",
+        assembly:"Сборка"
+      };
+      return m[k] || k;
+    }
+    function mapDeliveryName(k){
+      const m = {
+        deliver_ourselves:"Доставим сами",
+        pickup_supplier:"Забрать с поставщика",
+        pickup_cargo:"Забрать с карго"
+      };
+      return m[k] || "—";
+    }
+    function mapWarehouseName(k){
+      const m = { WB:"ВБ", OZON:"ОЗОН", YANDEX:"ЯНДЕКС", FBS:"FBS" };
+      return m[k] || "—";
+    }
+
+    // ===== Collect data =====
+    function collectAll(){
+      state.categoryOther = ($("categoryOther").value || "").trim();
+
+      const qty = Math.max(1, parseInt($("quantity").value || "1", 10));
+      $("quantity").value = qty;
+      state.quantity = qty;
+
+      state.dims.len = Number($("len").value || 0) || null;
+      state.dims.wid = Number($("wid").value || 0) || null;
+      state.dims.hei = Number($("hei").value || 0) || null;
+      state.dims.unit = ($("unit").value || "").trim() || "см";
+
+      state.delivery = ($("delivery").value || "").trim();
+      state.deliveryOther = ($("deliveryOther").value || "").trim();
+
+      state.servicesOther = ($("servicesOther").value || "").trim();
+
+      state.shipWarehouse = ($("shipWarehouse").value || "").trim();
+      state.shipWarehouseOther = ($("shipWarehouseOther").value || "").trim();
+
+      state.contact.name = ($("contactName").value || "").trim();
+      state.contact.phone = ($("contactPhone").value || "").trim();
+      state.contact.comment = ($("commentFinal").value || "").trim();
+    }
+
+    // ===== SQL & payload =====
     function sqlEscape(str) {
       if (str === null || str === undefined) return "";
       return String(str).replace(/\\/g, "\\\\").replace(/'/g, "''");
@@ -1046,7 +1051,8 @@
         delivery: state.delivery,
         delivery_other: state.deliveryOther,
 
-        services: state.services,
+        services: state.services.map(mapServiceName),
+        services_keys: state.services,
         services_other: state.servicesOther,
 
         ship_warehouse: state.shipWarehouse,
@@ -1069,30 +1075,15 @@
         "order_id",
         "tg_user_id",
         "tg_username",
-        "tg_first_name",
-        "tg_last_name",
-
         "category",
         "category_other",
-
         "quantity",
         "len","wid","hei","unit",
-
-        "delivery",
-        "delivery_other",
-
-        "services_json",
-        "services_other",
-
-        "ship_warehouse",
-        "ship_warehouse_other",
-
-        "point1_json",
-        "point2_json",
-
-        "contact_name",
-        "contact_phone",
-        "comment",
+        "delivery","delivery_other",
+        "services_json","services_other",
+        "ship_warehouse","ship_warehouse_other",
+        "point1_json","point2_json",
+        "contact_name","contact_phone","comment",
         "created_at"
       ];
 
@@ -1101,30 +1092,21 @@
         `'${sqlEscape(orderId)}'`,
         u.id ? Number(u.id) : "NULL",
         `'${sqlEscape(u.username || "")}'`,
-        `'${sqlEscape(u.first_name || "")}'`,
-        `'${sqlEscape(u.last_name || "")}'`,
-
         `'${sqlEscape(p.category)}'`,
         `'${sqlEscape(p.category_other)}'`,
-
         Number(p.quantity || 0),
         Number(p.dimensions?.len || 0),
         Number(p.dimensions?.wid || 0),
         Number(p.dimensions?.hei || 0),
         `'${sqlEscape(p.dimensions?.unit || "")}'`,
-
         `'${sqlEscape(p.delivery)}'`,
         `'${sqlEscape(p.delivery_other)}'`,
-
-        `'${sqlEscape(toJson(p.services))}'`,
+        `'${sqlEscape(toJson(p.services_keys))}'`,
         `'${sqlEscape(p.services_other)}'`,
-
         `'${sqlEscape(p.ship_warehouse)}'`,
         `'${sqlEscape(p.ship_warehouse_other)}'`,
-
         `'${sqlEscape(toJson(p.point1))}'`,
         `'${sqlEscape(toJson(p.point2))}'`,
-
         `'${sqlEscape(p.contact_name)}'`,
         `'${sqlEscape(p.contact_phone)}'`,
         `'${sqlEscape(p.comment)}'`,
@@ -1134,7 +1116,7 @@
       return `INSERT INTO orders (${cols.join(", ")})\nVALUES (${values.join(", ")});`;
     }
 
-    // ====== Overlay actions ======
+    // ===== Overlay =====
     ui.closeOverlayBtn.addEventListener("click", () => ui.acceptOverlay.classList.remove("show"));
     ui.copySqlBtn.addEventListener("click", async () => {
       try{
@@ -1150,9 +1132,9 @@
       ui.acceptOverlay.classList.add("show");
     }
 
-    // ====== Event listeners ======
+    // ===== Events =====
     function setupEventListeners() {
-      // Step1 categories (single)
+      // categories single select
       document.querySelectorAll(".category-item").forEach(item => {
         item.addEventListener("click", () => {
           const cat = item.dataset.category;
@@ -1163,25 +1145,10 @@
           item.classList.add("selected");
           item.querySelector(".custom-checkbox").classList.add("checked");
           state.selectedCategory = cat;
-          updateButtons();
         });
       });
 
-      $("categoryOther").addEventListener("input", (e) => state.categoryOther = e.target.value);
-
-      // Step2 inputs
-      $("quantity").addEventListener("input", (e) => {
-        const v = Math.max(1, parseInt(e.target.value || "1", 10));
-        e.target.value = v;
-        state.quantity = v;
-        updateButtons();
-      });
-      ["len","wid","hei","unit","delivery","deliveryOther"].forEach(id => {
-        $(id).addEventListener("input", updateButtons);
-        $(id).addEventListener("change", updateButtons);
-      });
-
-      // Step3 services toggle
+      // services toggle
       document.querySelectorAll(".service-item").forEach(item => {
         item.addEventListener("click", () => {
           const key = item.dataset.service;
@@ -1194,59 +1161,66 @@
           }
         });
       });
-      $("servicesOther").addEventListener("input", (e)=> state.servicesOther = e.target.value);
 
-      // Step4 inputs
-      $("shipWarehouse").addEventListener("change", updateButtons);
-      $("shipWarehouseOther").addEventListener("input", (e)=> state.shipWarehouseOther = e.target.value);
-      $("contactName").addEventListener("input", updateButtons);
-      $("contactPhone").addEventListener("input", updateButtons);
-      $("commentFinal").addEventListener("input", () => {});
+      // navigation
+      $("next1").addEventListener("click", () => {
+        if (!state.selectedCategory) return;
+        showStep(2);
+      });
 
-      // Navigation
-      $("next1").addEventListener("click", () => showStep(2));
       $("prev2").addEventListener("click", () => showStep(1));
-      $("next2").addEventListener("click", () => showStep(3));
+      $("next2").addEventListener("click", () => {
+        if (!validateStep2(true)) return;
+        showStep(3);
+      });
+
       $("prev3").addEventListener("click", () => showStep(2));
       $("next3").addEventListener("click", () => showStep(4));
-      $("prev4").addEventListener("click", () => showStep(3));
 
-      // Submit: send to bot (via WebApp sendData)
+      $("prev4").addEventListener("click", () => showStep(3));
+      $("next4").addEventListener("click", () => {
+        if (!validateStep4(true)) return;
+        showStep(5);
+      });
+
+      $("prev5").addEventListener("click", () => showStep(4));
+
+      // live hide warnings
+      ["quantity","len","wid","hei","unit","delivery"].forEach(id=>{
+        $(id).addEventListener("input", ()=>validateStep2(false));
+        $(id).addEventListener("change", ()=>validateStep2(false));
+      });
+      ["shipWarehouse","contactName","contactPhone"].forEach(id=>{
+        $(id).addEventListener("input", ()=>validateStep4(false));
+        $(id).addEventListener("change", ()=>validateStep4(false));
+      });
+
+      // submit
       $("submit").addEventListener("click", () => {
-        // Enforce Telegram account presence
+        // сбор данных
+        collectAll();
+
+        // проверки
+        if (!state.selectedCategory) { showStep(1); return; }
+        if (!validateStep2(true)) { showStep(2); return; }
+        if (!validateStep4(true)) { showStep(4); return; }
+
         const user = getTgUser();
         if (!tg || !user) {
-          alert("Откройте форму из @Big_Full_bot внутри Telegram (Mini App), чтобы отправить данные боту.");
+          ui.warnSend.style.display = "block";
           return;
         }
-
-        state.dims.len = Number($("len").value || 0);
-        state.dims.wid = Number($("wid").value || 0);
-        state.dims.hei = Number($("hei").value || 0);
-        state.dims.unit = ($("unit").value || "").trim();
-
-        state.delivery = ($("delivery").value || "").trim();
-        state.deliveryOther = ($("deliveryOther").value || "").trim();
-
-        state.shipWarehouse = ($("shipWarehouse").value || "").trim();
-
-        state.contact.name = ($("contactName").value || "").trim();
-        state.contact.phone = ($("contactPhone").value || "").trim();
-        state.contact.comment = ($("commentFinal").value || "").trim();
-
-        updateButtons();
-        if ($("submit").disabled) return;
 
         const payload = buildPayload();
         const orderId = `ORD-${Math.floor(100000 + Math.random()*900000)}`;
         const sql = buildSqlInsert(orderId, payload);
 
-        // 1) показать "принято"
+        // 1) итоговое “принято” в приложении
         showAccepted(orderId, sql);
 
-        // 2) отправить данные в бот (бот получит web_app_data)
+        // 2) отправка в бот, который открыл WebApp (НЕ по @username)
+        // Бот получит это как message.web_app_data.data
         tg.sendData(JSON.stringify({
-          bot_username: "@Big_Full_bot",
           order_id: orderId,
           payload: payload,
           sql: sql
@@ -1254,18 +1228,17 @@
       });
     }
 
-    // ====== Init ======
+    // ===== Init =====
     document.addEventListener("DOMContentLoaded", () => {
       initTelegramUI();
       initMap();
       setupEventListeners();
-      updateButtons();
+
+      // важное: в step5 “Отправка” активна только в Telegram
+      const canSend = inTelegram() && !!getTgUser();
+      ui.warnSend.style.display = canSend ? "none" : "block";
+      $("submit").disabled = !canSend;
     });
   </script>
 </body>
 </html>
-
-
-
-
-
